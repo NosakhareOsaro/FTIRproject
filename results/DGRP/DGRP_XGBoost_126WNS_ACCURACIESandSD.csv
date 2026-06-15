@@ -1,0 +1,16 @@
+model,"accuracy,SD"
+"('Logistic Regression', LogisticRegression(C=100, class_weight='balanced'))","[np.float64(0.8178807947019868), np.float64(0.02250681518935951)]"
+"('C-Support Vector Classification', SVC(C=1000, gamma=5, kernel='poly'))","[np.float64(0.8629139072847682), np.float64(0.02682732331195905)]"
+"('k-nearest Neighbours', KNeighborsClassifier(metric='manhattan', n_neighbors=15, weights='distance'))","[np.float64(0.8119205298013243), np.float64(0.022004301623624038)]"
+"('Random Forest', RandomForestClassifier(criterion='entropy', max_depth=6, n_estimators=500))","[np.float64(0.8139072847682121), np.float64(0.023404764300758007)]"
+"('XGBoost', XGBClassifier(base_score=None, booster=None, callbacks=None,
+              colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=None, device=None, early_stopping_rounds=None,
+              enable_categorical=False, eval_metric=None, feature_types=None,
+              feature_weights=None, gamma=None, grow_policy=None,
+              importance_type=None, interaction_constraints=None,
+              learning_rate=None, max_bin=None, max_cat_threshold=None,
+              max_cat_to_onehot=None, max_delta_step=None, max_depth=4,
+              max_leaves=None, min_child_weight=None, missing=nan,
+              monotone_constraints=None, multi_strategy=None, n_estimators=500,
+              n_jobs=None, num_parallel_tree=None, ...))","[np.float64(0.8096026490066226), np.float64(0.037102349795330655)]"
