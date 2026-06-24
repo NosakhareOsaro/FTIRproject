@@ -44,7 +44,7 @@ OUT_DIR = REPO / "results" / "DGRP"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 N_PCS        = 4                    # PCA: 95% variance threshold (established in compression analysis)
-N_COMP_LIST  = [1, 2, 3, 5, 10]    # PLS: sweep over these
+N_COMP_LIST  = [1, 2, 3, 5, 10, 15, 20]    # PLS: sweep over these
 RIDGE_ALPHA  = 1.0                  # Ridge alpha — not tuned; purpose is to evaluate PCA representation
 
 plt.rcParams.update({
