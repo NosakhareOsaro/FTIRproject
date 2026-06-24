@@ -6,7 +6,7 @@ evaluation design so any assistant starting fresh has the full picture.
 
 **Author:** Nosakhare Odionfo Osaro (MSc Bioinformatics, University of Glasgow)
 **Supervisor:** Dr Adam Dobson
-**Last updated:** 15 June 2026
+**Last updated:** 24 June 2026
 
 ---
 
@@ -15,18 +15,25 @@ evaluation design so any assistant starting fresh has the full picture.
 MSc dissertation. Working title: _Machine Learning Signatures of Microbiome
 Perturbation_ (the official title is broader than the actual work — see below).
 
-**Actual focus:** benchmarking machine learning against frequentist/standard
-approaches for predicting organismal phenotype from FTIR spectra in
-_Drosophila melanogaster_. This builds directly on a lab pre-print (Ibrahim
-et al., bioRxiv 2026, doi:10.64898/2026.03.22.713522) — "chemotyping" — which
-uses ATR-FTIR + ML to classify biological variation and predict starvation
-resistance.
+**Actual focus:** comprehensive exploration of multivariate methods for
+phenotype prediction from FTIR spectra in _Drosophila melanogaster_. The
+core question is: can we generate continuous vectors from spectra that
+reliably predict phenotype in individuals not seen during training? This
+builds directly on a lab pre-print (Ibrahim et al., bioRxiv 2026,
+doi:10.64898/2026.03.22.713522) — "chemotyping" — which uses ATR-FTIR + ML
+to classify biological variation and predict starvation resistance.
 
-**Framing:** the FTIR/DGRP work is the primary case study. The broader
-"ML vs frequentist on low-N high-P omics" question lives in the introduction
-and discussion. A set of external clinical cohorts (NoMIC, EATRIS-Plus, ROP,
-IBD, IMPACC, CMAISE) are referenced as motivation only, not worked through —
-unless time allows after the FTIR work.
+**Framing:** the project is now "explore the method space comprehensively"
+rather than "test a specific hypothesis." The FTIR/DGRP work is the primary
+case study. Methods span dimensionality reduction (PCA, tSNE), methods that
+do both reduction and prediction (PLS-DA, sPLS-DA), and direct prediction
+(LASSO, ridge regression, elastic net, random forest). Regularised/frequentist
+methods (PLS-DA, elastic net, LASSO) serve as baselines within the broader
+comparison — the frequentist angle is not abandoned, just embedded in a wider
+sweep. Common evaluation yardstick: held-out prediction performance (R² for
+continuous targets, accuracy for discrete). A set of external clinical cohorts
+(NoMIC, EATRIS-Plus, ROP, IBD, IMPACC, CMAISE) are referenced as motivation
+only, not worked through — unless time allows after the FTIR work.
 
 ---
 
@@ -49,18 +56,24 @@ The pre-print has two limitations that this project addresses:
 
 ---
 
-## 3. The three contributions (agreed with supervisor)
+## 3. The three contributions (agreed with supervisor, updated 24 Jun 2026)
 
-1. **Add PLS-DA / PLS regression** as the missing frequentist baseline across
-   the existing experiments.
-2. **Build a regression pipeline** that uses continuous outcomes directly.
-   Start with the 108 DGRP starvation-resistance EMMeans. Use **SVR** as the
+1. **Systematic method comparison** across the full space of multivariate
+   approaches: dimensionality reduction only (PCA, tSNE), methods that reduce
+   and predict (PLS-DA, sPLS-DA), and direct prediction (LASSO, ridge,
+   elastic net, random forest, SVR). Both the dimensionality-reduction and
+   direct-prediction families must be tested; PLS-DA, elastic net, and LASSO
+   serve as the regularised/frequentist baselines within the comparison.
+2. **Build a regression pipeline that predicts continuously.** Starvation
+   resistance (108 DGRP EMMeans) is the primary target. Use **SVR** as the
    like-for-like counterpart to the pre-print's best classifier (SVM).
-3. **Extend to other continuous phenotypes** (lifespan, fecundity, age).
-   The DGRP panel has extensive public phenotype data — see
+   Two evaluation settings: (a) per-fly spectra with line-stratified CV,
+   (b) collapsed mean spectrum per DGRP line.
+3. **Extend to other DGRPool phenotypes** (lifespan, fecundity, age at
+   measurement). The DGRP panel has extensive public phenotype data —
    https://dgrpool.epfl.ch/ — so the same spectra can be tested against many
-   phenotypes. (Need to produce a shortlist of well-measured continuous
-   phenotypes from there.)
+   continuous targets. Starvation resistance remains the positive control
+   (signal is confirmed to be there).
 
 ---
 
@@ -115,7 +128,7 @@ columns running from 3900 down to ~456 cm⁻¹. Column count varies (1727 vs 172
 
 - Diet: `D05`/`D10`/`D20` (yeast %), `LI`/`SY` (lipid vs standard yeast)
 - Age: `09D`, `04W`, `06W`, `03W`, `UNK`
-- Sex: `F`, `M`, and `S` (placeholder in Diet1) ; some `UNK`/`SY` placeholders
+- Sex: `F`, `M`, and `S` (`S` in Diet1 = confirmed female by data owner); some `UNK`/`SY` placeholders
 
 Phenotype data:
 
@@ -144,19 +157,37 @@ Phenotype data:
 
 ---
 
-## 7. Work order (current plan)
+## 7. Work order (updated 24 Jun 2026)
 
-1. **Reproduce Rita's classification baseline** on `DGRPFTIR.dat`. Success =
-   recover the paper's ~88% resistant / ~84% sensitive SVM reclassification.
-   This is the gate — nothing downstream is trustworthy until this works.
-2. **Write a clean data loader** that reads any of the 6 .dat files, normalises
-   the messy metadata, returns tidy (spectra, metadata) dataframes.
-3. **Reproduce the R survival analysis** to regenerate `Emmeans.csv` (+ SEs).
-4. **Build the regression pipeline** — parallel to MIRSPIPELINE: SVR,
-   ElasticNet, RandomForestRegressor, XGBRegressor, plus PLSRegression.
-   Per-fly training, line-stratified CV, line-level evaluation (see §4).
-   Headline comparison: SVR-on-continuous vs SVM-on-binary vs PLS.
-5. **Extend to other phenotypes** (dgrpool shortlist).
+Steps 1–3 are done or in progress; steps 4–6 are the active frontier.
+
+1. **[DONE] Reproduce Rita's classification baseline** on `DGRPFTIR.dat`.
+   Recovered ~88.5% resistant / ~83.9% sensitive SVM reclassification
+   (paper: 88% / 84%). Gate passed.
+2. **[DONE] Write a clean data loader** (`scripts/ftir_loader.py`) — reads
+   any of the 6 .dat files, normalises messy metadata, validates wavenumber
+   axis.
+3. **[DONE] Reproduce the R survival analysis** to regenerate `Emmeans.csv`
+   (+ SEs). EMMeans match Morgante 2015 (r=0.46, 93/108 lines overlap).
+4. **Build the method-comparison pipeline.** Implement and evaluate all methods
+   from §3 on `DGRPFTIR.dat` with starvation EMMeans as target. Two evaluation
+   settings must both be reported:
+   - **(a) Per-fly with line-stratified CV** (see §4 for correctness
+     requirements — this is the most important).
+   - **(b) Line-mean spectra** (collapse first, then fit and evaluate on 108
+     line means; simpler but lower-N).
+   Evaluation metric: held-out R², RMSE, Spearman ρ for continuous targets;
+   accuracy for any discrete targets. PLS-DA, elastic net, and LASSO are the
+   regularised baselines. SVR is the like-for-like ML comparator to the
+   pre-print's SVM classifier.
+5. **Extend to other DGRPool phenotypes** — produce a shortlist of
+   well-measured continuous phenotypes, run the same pipeline, assess whether
+   spectral signal generalises beyond starvation resistance.
+6. **Meeting with Vinny Davies** (mathematician, potential collaborator) —
+   Monday 29 June 2026, 2 pm. No fixed agenda; may shape the mathematical
+   approach, particularly around how to compare dimensionality-reduction
+   methods with direct prediction methods, and whether Bayesian/GP approaches
+   are worth adding given small N.
 
 ---
 

@@ -36,14 +36,11 @@ _AGE_MAP = {
 }
 
 # Sex: F/M are unambiguous.
-# 'S' appears only in Diet1FTIR.dat.  The pre-print states diet experiments used
-# female flies, which makes 'S' unlikely to mean "unknown sex" — but the exact
-# meaning has not been confirmed.
-# TODO: confirm what 'S' represents with Dr Rita Ibrahim before using Diet1 sex labels.
+# 'S' appears only in Diet1FTIR.dat — confirmed female by data owner (Rita Ibrahim).
 _SEX_MAP = {
     "F": "F",
     "M": "M",
-    "S": "S",  # unresolved — left as-is pending confirmation with data owner
+    "S": "F",  # confirmed female by data owner (Rita Ibrahim)
 }
 
 # Genot. is left unnormalised because values are experiment-specific:
