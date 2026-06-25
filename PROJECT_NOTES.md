@@ -6,7 +6,7 @@ evaluation design so any assistant starting fresh has the full picture.
 
 **Author:** Nosakhare Odionfo Osaro (MSc Bioinformatics, University of Glasgow)
 **Supervisor:** Dr Adam Dobson
-**Last updated:** 24 June 2026
+**Last updated:** 25 June 2026
 
 ---
 
@@ -157,9 +157,9 @@ Phenotype data:
 
 ---
 
-## 7. Work order (updated 24 Jun 2026)
+## 7. Work order (updated 25 Jun 2026)
 
-Steps 1–3 are done or in progress; steps 4–6 are the active frontier.
+Steps 1–4 complete. Steps 5–6 are the active frontier.
 
 1. **[DONE] Reproduce Rita's classification baseline** on `DGRPFTIR.dat`.
    Recovered ~88.5% resistant / ~83.9% sensitive SVM reclassification
@@ -169,17 +169,8 @@ Steps 1–3 are done or in progress; steps 4–6 are the active frontier.
    axis.
 3. **[DONE] Reproduce the R survival analysis** to regenerate `Emmeans.csv`
    (+ SEs). EMMeans match Morgante 2015 (r=0.46, 93/108 lines overlap).
-4. **Build the method-comparison pipeline.** Implement and evaluate all methods
-   from §3 on `DGRPFTIR.dat` with starvation EMMeans as target. Two evaluation
-   settings must both be reported:
-   - **(a) Per-fly with line-stratified CV** (see §4 for correctness
-     requirements — this is the most important).
-   - **(b) Line-mean spectra** (collapse first, then fit and evaluate on 108
-     line means; simpler but lower-N).
-   Evaluation metric: held-out R², RMSE, Spearman ρ for continuous targets;
-   accuracy for any discrete targets. PLS-DA, elastic net, and LASSO are the
-   regularised baselines. SVR is the like-for-like ML comparator to the
-   pre-print's SVM classifier.
+4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
+   (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
 5. **Extend to other DGRPool phenotypes** — produce a shortlist of
    well-measured continuous phenotypes, run the same pipeline, assess whether
    spectral signal generalises beyond starvation resistance.
@@ -188,6 +179,52 @@ Steps 1–3 are done or in progress; steps 4–6 are the active frontier.
    approach, particularly around how to compare dimensionality-reduction
    methods with direct prediction methods, and whether Bayesian/GP approaches
    are worth adding given small N.
+
+---
+
+## 7a. Results so far (25 Jun 2026)
+
+### PCA compression (`scripts/run_compression_analysis.py`)
+
+- **Individual-fly PCA (Order A):** PC1 vs EMMean r = −0.05, p = 0.61 —
+  within-line noise swamps the genotype signal when PCA is fitted on all
+  ~1,772 individual fly spectra.
+- **Line-mean PCA (Order B):** averaging ~16 spectra per line first cancels
+  within-line noise; PC1 of the 108-line-mean matrix vs EMMean r = +0.685,
+  p = 2.92e−16. **Order B is the correct collapse order.**
+- **Dimensionality:** only 4 PCs reach 95% explained variance — FTIR spectra
+  of *Drosophila* are very low-dimensional (PC1 = 53.6%, PC2 = 32.2%).
+
+### Method comparison — LOO-CV on 108 DGRP line-mean spectra
+
+All methods use StandardScaler fitted inside each training fold. α/hyperparameters
+selected by inner CV within the training fold only (test line never seen).
+
+| Method | CV R² | Spearman ρ | Script |
+| --- | --- | --- | --- |
+| PCA + Ridge (4 PCs) | 0.553 | +0.743 | `run_compression_analysis.py` + `run_regularised_regression.py` |
+| PLS (10 components, optimal) | 0.623 | +0.801 | `run_pls_analysis.py` |
+| Ridge (raw 1,723 wn) | 0.635 | +0.809 | `run_regularised_regression.py` |
+| LASSO | 0.669 | +0.813 | `run_regularised_regression.py` |
+| **Elastic net (best)** | **0.673** | **+0.816** | `run_regularised_regression.py` |
+
+**Key finding:** Direct sparse regression (elastic net, LASSO) on raw spectra
+outperforms dimensionality-reduction-then-predict (PLS, PCA+Ridge). The L1
+penalty is a more efficient compression for this phenotype prediction task than
+PLS latent structure.
+
+**PLS model selection:** performance peaks at n=10 components (CV R²=0.623) and
+declines at n=15 (0.550) and n=20 (0.515) — classic overfitting with n=108
+lines.
+
+**PLS loading vector:** prediction driven primarily by the C–H stretching region
+(~2,900–3,000 cm⁻¹), consistent with lipid content as the main spectral
+correlate of starvation resistance.
+
+**Still to do on line-mean setting:** random forest, SVR, tSNE (visualisation).
+**Still to do:** per-fly setting with line-stratified CV (§4) — the more
+rigorous but harder evaluation. The line-mean results are a fast sanity check;
+the per-fly setting is the one that goes in the dissertation.
 
 ---
 
