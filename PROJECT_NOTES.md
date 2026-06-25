@@ -200,18 +200,22 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
 All methods use StandardScaler fitted inside each training fold. α/hyperparameters
 selected by inner CV within the training fold only (test line never seen).
 
-| Method | CV R² | Spearman ρ | Script |
-| --- | --- | --- | --- |
-| PCA + Ridge (4 PCs) | 0.553 | +0.743 | `run_compression_analysis.py` + `run_regularised_regression.py` |
-| PLS (10 components, optimal) | 0.623 | +0.801 | `run_pls_analysis.py` |
-| Ridge (raw 1,723 wn) | 0.635 | +0.809 | `run_regularised_regression.py` |
-| LASSO | 0.669 | +0.813 | `run_regularised_regression.py` |
-| **Elastic net (best)** | **0.673** | **+0.816** | `run_regularised_regression.py` |
+| Method | CV R² | RMSE | Spearman ρ | Script |
+| --- | --- | --- | --- | --- |
+| PCA + Ridge (4 PCs) | 0.553 | 0.4927 | +0.743 | `run_compression_analysis.py` + `run_regularised_regression.py` |
+| PLS (10 components, optimal) | 0.623 | 0.4524 | +0.801 | `run_pls_analysis.py` |
+| Random forest (max_features=0.3) | 0.540 | 0.4998 | +0.729 | `run_random_forest.py` |
+| Ridge (raw 1,723 wn) | 0.635 | 0.4451 | +0.809 | `run_regularised_regression.py` |
+| LASSO | 0.669 | 0.4266 | +0.813 | `run_regularised_regression.py` |
+| **Elastic net (best)** | **0.673** | **0.4244** | **+0.816** | `run_regularised_regression.py` |
 
 **Key finding:** Direct sparse regression (elastic net, LASSO) on raw spectra
-outperforms dimensionality-reduction-then-predict (PLS, PCA+Ridge). The L1
-penalty is a more efficient compression for this phenotype prediction task than
-PLS latent structure.
+outperforms all other methods. Random forest (R²=0.540) performs similarly to
+PCA+Ridge — the non-linear ensemble offers no advantage over linear methods
+here, consistent with spectral data being highly collinear and the signal being
+largely captured by a few broad spectral regions rather than non-linear
+interactions. The L1 penalty is a more efficient compression for this phenotype
+prediction task than either PLS latent structure or RF tree splits.
 
 **PLS model selection:** performance peaks at n=10 components (CV R²=0.623) and
 declines at n=15 (0.550) and n=20 (0.515) — classic overfitting with n=108
@@ -221,10 +225,38 @@ lines.
 (~2,900–3,000 cm⁻¹), consistent with lipid content as the main spectral
 correlate of starvation resistance.
 
-**Still to do on line-mean setting:** random forest, SVR, tSNE (visualisation).
-**Still to do:** per-fly setting with line-stratified CV (§4) — the more
-rigorous but harder evaluation. The line-mean results are a fast sanity check;
-the per-fly setting is the one that goes in the dissertation.
+**RF hyperparameter selection:** modal best params across 108 LOO folds:
+`max_features=0.3, n_estimators=100`. Inner 3-fold GridSearchCV over
+{n_estimators: [100,300], max_features: ["sqrt","log2",0.1,0.3]}.
+
+**Still to do on line-mean setting:** SVR, tSNE (visualisation).  Random forest done (see table above).
+
+### Per-fly pipeline — GroupKFold(10) (`scripts/run_perfly_pipeline.py`)
+
+Training unit: individual fly spectra (~1,772 females). Outer CV:
+GroupKFold(n_splits=10) with DGRP line as the group (no fly from a given line
+appears in both train and test). After all folds, predictions are averaged
+within each test-fold line → one predicted value per line, then compared to
+EMMeans. This is the dissertation-grade evaluation.
+
+| Method | Line R² | RMSE | Spearman ρ | Pearson r |
+| --- | --- | --- | --- | --- |
+| PLS (n_comp by inner GroupKFold-5) | 0.534 | 0.5029 | +0.794 | +0.802 |
+| Ridge | 0.515 | 0.5130 | +0.767 | +0.764 |
+| LASSO | 0.517 | 0.5121 | +0.781 | +0.768 |
+| Elastic net | 0.518 | 0.5113 | +0.783 | +0.771 |
+
+**Key finding:** PLS wins the per-fly setting (ranking inverted vs line-mean
+LOO-CV, where sparse models dominated). The L1 sparse models drop ~0.15 R²
+relative to their line-mean performance — they appear to overfit to
+individual-fly spectral variation that does not generalise across lines.
+All four methods are tightly clustered (line R² 0.515–0.534), suggesting
+within-line noise is the dominant bottleneck rather than model class.
+
+Per-fly R² (before line-averaging) is much lower (0.31–0.36) — this is
+expected: within-line spectral noise is real and cannot be learned from
+line-level targets. The line R² values above are the correct dissertation
+metric. Results also saved to `results/DGRP/perfly_metrics.csv`.
 
 ---
 
