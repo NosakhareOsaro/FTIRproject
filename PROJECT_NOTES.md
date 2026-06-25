@@ -171,9 +171,10 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    (+ SEs). EMMeans match Morgante 2015 (r=0.46, 93/108 lines overlap).
 4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
    (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
-5. **Extend to other DGRPool phenotypes** — produce a shortlist of
+5. **[IN PROGRESS] Extend to other DGRPool phenotypes** — produce a shortlist of
    well-measured continuous phenotypes, run the same pipeline, assess whether
-   spectral signal generalises beyond starvation resistance.
+   spectral signal generalises beyond starvation resistance. Lifetime fecundity
+   tested first (see §7b); no signal found.
 6. **Meeting with Vinny Davies** (mathematician, potential collaborator) —
    Monday 29 June 2026, 2 pm. No fixed agenda; may shape the mathematical
    approach, particularly around how to compare dimensionality-reduction
@@ -257,6 +258,40 @@ Per-fly R² (before line-averaging) is much lower (0.31–0.36) — this is
 expected: within-line spectral noise is real and cannot be learned from
 line-level targets. The line R² values above are the correct dissertation
 metric. Results also saved to `results/DGRP/perfly_metrics.csv`.
+
+---
+
+## 7b. Cross-phenotype results (25 Jun 2026)
+
+### Lifetime fecundity (`scripts/run_fecundity_enet.py`)
+
+Phenotype: DGRPool study 18, female lifetime fecundity means (eggs/female).
+96 of 108 spectral lines have a fecundity value; 12 dropped (no DGRPool entry).
+Same elastic net LOO-CV as starvation resistance (identical hyperparameters).
+
+| Phenotype | n lines | Elastic net CV R² | RMSE |
+| --- | --- | --- | --- |
+| Starvation resistance | 108 | 0.673 | 0.4244 |
+| Lifetime fecundity | 96 | −0.109 | 20.913 |
+
+**Finding: no spectral signal for lifetime fecundity.** The model predicts
+approximately the training mean for every test point (prediction SD ≈ 2.8 vs
+true SD ≈ 19.9). Elastic net selects maximum regularisation, driving all
+coefficients near zero. R² = −0.109 (worse than a mean baseline).
+
+**Methodological note on Spearman ρ:** the raw LOO output shows ρ ≈ −1, which
+is a numerical artefact — with near-constant predictions, the LOO mean-shift
+effect dominates (holding out a high-fecundity line slightly lowers the training
+mean, so the model predicts slightly lower for high-true lines → artificial
+monotone negative trend). ρ is not reported for this result; R² is the correct
+metric. The starvation/fecundity cross-phenotype correlation is only ρ = −0.04
+(p = 0.68), confirming no biological confound.
+
+**Interpretation:** the FTIR spectral signal is specific to starvation
+resistance (and its biochemical correlates, primarily lipid content), and does
+not generalise to lifetime fecundity. This is a meaningful negative result for
+the dissertation — it rules out the FTIR chemotype being a generic indicator of
+all life-history variation.
 
 ---
 
