@@ -1,0 +1,3 @@
+phenotype,study,n_lines,cv_r2,rmse,spearman_rho,date_run
+Starvation resistance (EMMeans),Internal PSM model,108,0.6729258678238161,0.4212567633172316,0.8166185563081729,2026-07-03
+Starvation resistance,Morgante 2015,104,0.040840936571469144,12.951681677966247,0.15037662174813063,2026-07-03
