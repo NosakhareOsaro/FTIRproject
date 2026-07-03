@@ -168,7 +168,9 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    any of the 6 .dat files, normalises messy metadata, validates wavenumber
    axis.
 3. **[DONE] Reproduce the R survival analysis** to regenerate `Emmeans.csv`
-   (+ SEs). EMMeans match Morgante 2015 (r=0.46, 93/108 lines overlap).
+   (+ SEs). EMMeans match Morgante 2015 (r=0.428, 104/108 lines overlap;
+   corrected 2026-07-03 from an earlier 93-line count that undercounted
+   zero-padded Morgante IDs like `DGRP_021`).
 4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
    (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
 5. **[IN PROGRESS] Extend to other DGRPool phenotypes** — produce a shortlist of

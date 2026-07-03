@@ -44,10 +44,16 @@ emmeans = pd.read_csv(emmeans_path)
 print(f"EMMeans lines : {len(emmeans)}")
 print(f"EMMeans ID format examples: {emmeans['DGRP'].iloc[:3].tolist()}")
 
-# Normalise: Morgante uses DGRP_100, ours uses DGRP100
+# Normalise: Morgante uses DGRP_021 (zero-padded), ours uses DGRP21.
+# Stripping the underscore alone is not enough -- DGRP_021 -> DGRP021 still
+# fails to match DGRP21. Round-tripping through int() drops the leading
+# zeros too (same normalisation as scripts/run_dgrpool_phenotype.py).
+def _normalise_dgrp_id(s):
+    return "DGRP" + str(int(s.replace("DGRP", "").replace("_", "")))
+
 morg_f = morg_raw[morg_raw["sex"] == "F"].copy()
-morg_f["DGRP_norm"] = morg_f["DGRP"].str.replace("_", "", regex=False)
-emmeans["DGRP_norm"] = emmeans["DGRP"].str.replace("_", "", regex=False)
+morg_f["DGRP_norm"] = morg_f["DGRP"].apply(_normalise_dgrp_id)
+emmeans["DGRP_norm"] = emmeans["DGRP"].apply(_normalise_dgrp_id)
 
 our_lines     = set(emmeans["DGRP_norm"])
 morgante_lines = set(morg_f["DGRP_norm"])
