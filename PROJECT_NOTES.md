@@ -297,6 +297,55 @@ all life-history variation.
 
 ---
 
+## 7c. General-purpose cross-phenotype pipeline (3–4 Jul 2026)
+
+`scripts/run_dgrpool_phenotype.py` generalises the fecundity script into a
+command-line tool: any DGRPool-format phenotype TSV (`DGRP`, `sex`, `value`)
+can be run through the same elastic net LOO-CV pipeline used for starvation
+resistance. Each run appends one row to
+`results/DGRP/dgrpool_phenotype_summary.csv`, so results accumulate
+automatically across phenotypes.
+
+**Validation:** run first against `S00_EMMeans_starvation.tsv` — our own
+EMMeans reformatted as a mock DGRPool TSV — to confirm the script reproduces
+the known result (R²≈0.673) before trusting it on real external phenotypes.
+
+| Phenotype | Study | n lines | Elastic net CV R² | RMSE | Spearman ρ |
+| --- | --- | --- | --- | --- | --- |
+| Starvation resistance (EMMeans, smoke test) | Internal PSM model | 108 | +0.673 | 0.4213 | +0.817 |
+| Starvation resistance | Morgante 2015 | 104 | +0.041 | 12.952 | +0.150 |
+| Lifespan | Ivanov 2015 | 104 | −0.052 | 9.917 | −0.012 |
+| Chill coma recovery | Morgante 2015 | 95 | −0.060 | 5.332 | −0.305 (artefact) |
+| Cuticle HC n-C25 | Dembeck 2015 | 91 | −0.052 | 0.0258 | −0.947 (artefact) |
+
+**Smoke test passed:** the S00 row exactly reproduces the
+`run_regularised_regression.py` result, confirming the general-purpose script
+is correct.
+
+**Morgante starvation resistance (cross-lab validation):** R²=+0.041 is far
+weaker than our own EMMeans (R²=0.673), but this is expected — Morgante's
+measurement is an independent, noisy replicate of the same phenotype in a
+different lab, not the same target the model was fitted against. The
+line-level correlation between our EMMeans and Morgante's means is only
+Pearson r=0.428 (p=5.88e-06; see `scripts/check_morgante_overlap.py`), so a
+model trained on one is not expected to predict the other well even before
+FTIR enters the picture. (Overlap was corrected 2026-07-03 from 93→104 lines —
+the original script under-normalised zero-padded Morgante IDs.)
+
+**Lifespan, chill coma recovery, cuticle HC n-C25 — no spectral signal.** All
+three show negative CV R² with predictions collapsing to the training mean
+(see per-run notes in `phenotype-data/README.md`). The cuticle HC null result
+is the most notable: cuticular hydrocarbons are the most mechanistically
+direct cuticle-surface measurement tested against the FTIR chemotype, yet no
+signal is detected. Combined with the fecundity, lifespan, and chill coma
+nulls, this sharpens the picture from markdown 06 — the FTIR signal so far
+appears specific to starvation resistance itself (or its EMMean
+representation), not to lipid content or cuticle chemistry as a general
+category. This narrows rather than confirms the original lipid-metabolism
+hypothesis and is worth discussing directly with Adam.
+
+---
+
 ## 8. Environment
 
 Python: pandas, numpy, scikit-learn, xgboost, seaborn, matplotlib.
