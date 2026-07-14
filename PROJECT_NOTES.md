@@ -1,6 +1,6 @@
 # PROJECT_NOTES.md
 
-Context file for working on this project locally (e.g. with Claude Code).
+Context file for working on this project locally.
 Drop this in the repo root. It summarises the agreed plan, data status, and
 evaluation design so any assistant starting fresh has the full picture.
 
@@ -196,21 +196,21 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
   within-line noise; PC1 of the 108-line-mean matrix vs EMMean r = +0.685,
   p = 2.92e−16. **Order B is the correct collapse order.**
 - **Dimensionality:** only 4 PCs reach 95% explained variance — FTIR spectra
-  of *Drosophila* are very low-dimensional (PC1 = 53.6%, PC2 = 32.2%).
+  of _Drosophila_ are very low-dimensional (PC1 = 53.6%, PC2 = 32.2%).
 
 ### Method comparison — LOO-CV on 108 DGRP line-mean spectra
 
 All methods use StandardScaler fitted inside each training fold. α/hyperparameters
 selected by inner CV within the training fold only (test line never seen).
 
-| Method | CV R² | RMSE | Spearman ρ | Script |
-| --- | --- | --- | --- | --- |
-| PCA + Ridge (4 PCs) | 0.553 | 0.4927 | +0.743 | `run_compression_analysis.py` + `run_regularised_regression.py` |
-| PLS (10 components, optimal) | 0.623 | 0.4524 | +0.801 | `run_pls_analysis.py` |
-| Random forest (max_features=0.3) | 0.540 | 0.4998 | +0.729 | `run_random_forest.py` |
-| Ridge (raw 1,723 wn) | 0.635 | 0.4451 | +0.809 | `run_regularised_regression.py` |
-| LASSO | 0.669 | 0.4266 | +0.813 | `run_regularised_regression.py` |
-| **Elastic net (best)** | **0.673** | **0.4244** | **+0.816** | `run_regularised_regression.py` |
+| Method                           | CV R²     | RMSE       | Spearman ρ | Script                                                          |
+| -------------------------------- | --------- | ---------- | ---------- | --------------------------------------------------------------- |
+| PCA + Ridge (4 PCs)              | 0.553     | 0.4927     | +0.743     | `run_compression_analysis.py` + `run_regularised_regression.py` |
+| PLS (10 components, optimal)     | 0.623     | 0.4524     | +0.801     | `run_pls_analysis.py`                                           |
+| Random forest (max_features=0.3) | 0.540     | 0.4998     | +0.729     | `run_random_forest.py`                                          |
+| Ridge (raw 1,723 wn)             | 0.635     | 0.4451     | +0.809     | `run_regularised_regression.py`                                 |
+| LASSO                            | 0.669     | 0.4266     | +0.813     | `run_regularised_regression.py`                                 |
+| **Elastic net (best)**           | **0.673** | **0.4244** | **+0.816** | `run_regularised_regression.py`                                 |
 
 **Key finding:** Direct sparse regression (elastic net, LASSO) on raw spectra
 outperforms all other methods. Random forest (R²=0.540) performs similarly to
@@ -232,7 +232,7 @@ correlate of starvation resistance.
 `max_features=0.3, n_estimators=100`. Inner 3-fold GridSearchCV over
 {n_estimators: [100,300], max_features: ["sqrt","log2",0.1,0.3]}.
 
-**Still to do on line-mean setting:** SVR, tSNE (visualisation).  Random forest done (see table above).
+**Still to do on line-mean setting:** SVR, tSNE (visualisation). Random forest done (see table above).
 
 ### Per-fly pipeline — GroupKFold(10) (`scripts/run_perfly_pipeline.py`)
 
@@ -242,12 +242,12 @@ appears in both train and test). After all folds, predictions are averaged
 within each test-fold line → one predicted value per line, then compared to
 EMMeans. This is the dissertation-grade evaluation.
 
-| Method | Line R² | RMSE | Spearman ρ | Pearson r |
-| --- | --- | --- | --- | --- |
-| PLS (n_comp by inner GroupKFold-5) | 0.534 | 0.5029 | +0.794 | +0.802 |
-| Ridge | 0.515 | 0.5130 | +0.767 | +0.764 |
-| LASSO | 0.517 | 0.5121 | +0.781 | +0.768 |
-| Elastic net | 0.518 | 0.5113 | +0.783 | +0.771 |
+| Method                             | Line R² | RMSE   | Spearman ρ | Pearson r |
+| ---------------------------------- | ------- | ------ | ---------- | --------- |
+| PLS (n_comp by inner GroupKFold-5) | 0.534   | 0.5029 | +0.794     | +0.802    |
+| Ridge                              | 0.515   | 0.5130 | +0.767     | +0.764    |
+| LASSO                              | 0.517   | 0.5121 | +0.781     | +0.768    |
+| Elastic net                        | 0.518   | 0.5113 | +0.783     | +0.771    |
 
 **Key finding:** PLS wins the per-fly setting (ranking inverted vs line-mean
 LOO-CV, where sparse models dominated). The L1 sparse models drop ~0.15 R²
@@ -271,10 +271,10 @@ Phenotype: DGRPool study 18, female lifetime fecundity means (eggs/female).
 96 of 108 spectral lines have a fecundity value; 12 dropped (no DGRPool entry).
 Same elastic net LOO-CV as starvation resistance (identical hyperparameters).
 
-| Phenotype | n lines | Elastic net CV R² | RMSE |
-| --- | --- | --- | --- |
-| Starvation resistance | 108 | 0.673 | 0.4244 |
-| Lifetime fecundity | 96 | −0.109 | 20.913 |
+| Phenotype             | n lines | Elastic net CV R² | RMSE   |
+| --------------------- | ------- | ----------------- | ------ |
+| Starvation resistance | 108     | 0.673             | 0.4244 |
+| Lifetime fecundity    | 96      | −0.109            | 20.913 |
 
 **Finding: no spectral signal for lifetime fecundity.** The model predicts
 approximately the training mean for every test point (prediction SD ≈ 2.8 vs
@@ -310,13 +310,13 @@ automatically across phenotypes.
 EMMeans reformatted as a mock DGRPool TSV — to confirm the script reproduces
 the known result (R²≈0.673) before trusting it on real external phenotypes.
 
-| Phenotype | Study | n lines | Elastic net CV R² | RMSE | Spearman ρ |
-| --- | --- | --- | --- | --- | --- |
-| Starvation resistance (EMMeans, smoke test) | Internal PSM model | 108 | +0.673 | 0.4213 | +0.817 |
-| Starvation resistance | Morgante 2015 | 104 | +0.041 | 12.952 | +0.150 |
-| Lifespan | Ivanov 2015 | 104 | −0.052 | 9.917 | −0.012 |
-| Chill coma recovery | Morgante 2015 | 95 | −0.060 | 5.332 | −0.305 (artefact) |
-| Cuticle HC n-C25 | Dembeck 2015 | 91 | −0.052 | 0.0258 | −0.947 (artefact) |
+| Phenotype                                   | Study              | n lines | Elastic net CV R² | RMSE   | Spearman ρ        |
+| ------------------------------------------- | ------------------ | ------- | ----------------- | ------ | ----------------- |
+| Starvation resistance (EMMeans, smoke test) | Internal PSM model | 108     | +0.673            | 0.4213 | +0.817            |
+| Starvation resistance                       | Morgante 2015      | 104     | +0.041            | 12.952 | +0.150            |
+| Lifespan                                    | Ivanov 2015        | 104     | −0.052            | 9.917  | −0.012            |
+| Chill coma recovery                         | Morgante 2015      | 95      | −0.060            | 5.332  | −0.305 (artefact) |
+| Cuticle HC n-C25                            | Dembeck 2015       | 91      | −0.052            | 0.0258 | −0.947 (artefact) |
 
 **Smoke test passed:** the S00 row exactly reproduces the
 `run_regularised_regression.py` result, confirming the general-purpose script
