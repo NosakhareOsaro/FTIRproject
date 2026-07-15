@@ -5,7 +5,7 @@ Per-fly evaluation of four regression methods with line-stratified
 GroupKFold cross-validation.
 
 Training unit: individual fly spectra (~1,772 females, 108 DGRP lines).
-Target: each fly's line-level starvation-resistance EMMean — repeated for
+Target: each fly's line-level starvation-resistance EMMean, repeated for
 every fly in the same line because the FTIR and starvation assays are both
 destructive (fly-level pairing is impossible).
 
@@ -13,7 +13,7 @@ CV design (critical):
   Outer: GroupKFold(n_splits=10) with DGRP line as the group.
   No fly from a given line ever appears in both train and test in the same
   fold.  Violating this would allow the line-level target to leak across
-  folds and inflate all metrics — it is the single most important
+  folds and inflate all metrics; it is the single most important
   correctness requirement in this pipeline.
 
 Evaluation:
@@ -27,15 +27,15 @@ Evaluation:
   that the model cannot learn.
 
 Methods:
-  PLS        — PLSRegression; n_components ∈ {1,2,3,5,10} selected by
+  PLS        : PLSRegression; n_components ∈ {1,2,3,5,10} selected by
                inner GroupKFold(n_splits=5) on the outer training fold.
                GroupKFold used for the inner sweep to prevent the same
                line appearing on both sides of an inner split.
-  Ridge      — RidgeCV, GCV α selection (no explicit inner loop needed —
+  Ridge      : RidgeCV, GCV α selection (no explicit inner loop needed;
                GCV solves the full α path analytically on the training fold).
-  LASSO      — LassoCV, cv=3, n_alphas=30.  Random 3-fold for α selection
+  LASSO      : LassoCV, cv=3, n_alphas=30.  Random 3-fold for α selection
                only; test lines are already excluded by the outer fold.
-  ElasticNet — ElasticNetCV, cv=3, l1_ratio=[0.5,0.9,1.0], n_alphas=30.
+  ElasticNet : ElasticNetCV, cv=3, l1_ratio=[0.5,0.9,1.0], n_alphas=30.
 
 StandardScaler is fitted on the outer-fold training flies only inside
 each outer fold.
@@ -171,7 +171,7 @@ def line_aggregate(pred_df):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PLS — n_components selected by inner GroupKFold(5)
+# PLS: n_components selected by inner GroupKFold(5)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print("Running PLS  (outer GroupKFold=10, inner GroupKFold=5 for n_components) …")
@@ -202,7 +202,7 @@ print(f"  → line R²={pls_m['line_r2']:+.3f}  RMSE={pls_m['line_rmse']:.4f}  "
       f"per-fly R²={pls_m['perfly_r2']:+.3f}\n")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Ridge — RidgeCV with GCV (no explicit inner loop)
+# Ridge: RidgeCV with GCV (no explicit inner loop)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print("Running Ridge  (RidgeCV, GCV α selection) …")

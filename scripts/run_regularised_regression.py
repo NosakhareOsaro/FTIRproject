@@ -3,7 +3,7 @@ run_regularised_regression.py
 
 Ridge, LASSO, and elastic net on DGRP line-mean spectra with
 leave-one-line-out cross-validation.  Regularisation strength is
-selected automatically inside each training fold (correct nested CV —
+selected automatically inside each training fold (correct nested CV:
 the held-out test line never influences hyperparameter selection).
 
 All CV uses LeaveOneOut over 108 DGRP lines.  StandardScaler is fitted
@@ -97,7 +97,7 @@ def loo_cv_reg(X, y, model_fn, extra_attrs=()):
     LOO-CV with per-fold StandardScaling and hyperparameter tracking.
 
     model_fn must return a fresh fitted-CV estimator (RidgeCV, LassoCV,
-    or ElasticNetCV) — hyperparameter selection happens inside each fold
+    or ElasticNetCV); hyperparameter selection happens inside each fold
     on the 107 training lines only.
 
     Returns y_pred (n,), alphas (n,), extras dict of tracked attributes.
@@ -120,11 +120,11 @@ def loo_cv_reg(X, y, model_fn, extra_attrs=()):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part A — LOO-CV for Ridge, LASSO, elastic net
+# Part A: LOO-CV for Ridge, LASSO, elastic net
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # ── Ridge ─────────────────────────────────────────────────────────────────────
-# cv=None uses the GCV formula — exact LOO within the training fold, no refits.
+# cv=None uses the GCV formula: exact LOO within the training fold, no refits.
 
 print("\nRunning Ridge (RidgeCV, GCV) LOO-CV …")
 y_pred_ridge, alphas_ridge, _ = loo_cv_reg(
@@ -167,7 +167,7 @@ print(f"  R²={r2_enet:+.3f}  RMSE={rmse_enet:.4f}  ρ={rho_enet:+.3f}  "
       f"median α={alpha_enet_med:.4g}  median ℓ₁={l1_ratio_enet_med:.2f}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part B — Coefficient plot for the best regularised model
+# Part B: Coefficient plot for the best regularised model
 # ═══════════════════════════════════════════════════════════════════════════════
 
 new_results = {

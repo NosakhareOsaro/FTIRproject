@@ -20,7 +20,7 @@ morgante_path = root / "phenotype-data" / "S24_StarvationRes_summary_mean.tsv"
 emmeans_path  = root / "Emmeans.csv"
 out_path      = root / "results" / "DGRP" / "emmeans_vs_morgante_correlation.pdf"
 
-# ── Step 1: Inspect the raw file ──────────────────────────────────────────────
+# Step 1: inspect the raw file
 print("=" * 60)
 print("STEP 1 — Raw file inspection")
 print("=" * 60)
@@ -34,7 +34,7 @@ print(f"\nFirst 5 rows:")
 print(morg_raw.head().to_string(index=False))
 print(f"\nDGRP ID format examples: {morg_raw['DGRP'].iloc[:3].tolist()}")
 
-# ── Step 2: Overlap with our 108 EMMeans lines ────────────────────────────────
+# Step 2: overlap with our 108 EMMeans lines
 print()
 print("=" * 60)
 print("STEP 2 — Line overlap with Emmeans.csv")
@@ -79,7 +79,7 @@ print(f"  Median : {vals.median():.2f}")
 print(f"  Max    : {vals.max():.2f}")
 print(f"  SD     : {vals.std():.2f}")
 
-# ── Step 3: Correlation ───────────────────────────────────────────────────────
+# Step 3: correlation
 print()
 print("=" * 60)
 print("STEP 3 — Correlation: PSM EMMeans vs Morgante female means")

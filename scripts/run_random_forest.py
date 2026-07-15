@@ -4,7 +4,7 @@ run_random_forest.py
 Random forest regression on DGRP line-mean spectra with leave-one-line-out
 cross-validation.  Hyperparameters (n_estimators, max_features) are selected
 by inner 3-fold GridSearchCV on the 107 training lines inside each outer LOO
-fold — the held-out test line never influences hyperparameter selection.
+fold; the held-out test line never influences hyperparameter selection.
 
 n_jobs=1 throughout: parallel RF on M1 causes memory pressure.
 

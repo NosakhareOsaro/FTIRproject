@@ -6,9 +6,9 @@ explicitly maximises covariance between spectra and starvation EMMeans,
 whereas PCA only maximises spectral variance.
 
 Parts:
-  A — PLSRegression with LOO-CV over n_components ∈ {1,2,3,5,10}.
+  A: PLSRegression with LOO-CV over n_components ∈ {1,2,3,5,10}.
       Full-data fit for: LV1 scores vs EMMean scatter; LV1 weight vector plot.
-  B — PCA + Ridge LOO-CV (same folds, same scaler discipline) for direct
+  B: PCA + Ridge LOO-CV (same folds, same scaler discipline) for direct
       comparison on identical evaluation footing.
 
 All CV uses leave-one-line-out (LeaveOneOut over 108 DGRP lines).
@@ -45,7 +45,7 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 N_PCS        = 4                    # PCA: 95% variance threshold (established in compression analysis)
 N_COMP_LIST  = [1, 2, 3, 5, 10, 15, 20]    # PLS: sweep over these
-RIDGE_ALPHA  = 1.0                  # Ridge alpha — not tuned; purpose is to evaluate PCA representation
+RIDGE_ALPHA  = 1.0                  # Ridge alpha, not tuned; purpose is to evaluate PCA representation
 
 plt.rcParams.update({
     "figure.dpi": 150,
@@ -87,7 +87,7 @@ print(f"Lines in analysis : {n_lines}  (DGRP lines with both spectra and EMMeans
 print(f"Spectral features : {X_line.shape[1]} wavenumbers")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part A — PLS regression with LOO-CV
+# Part A: PLS regression with LOO-CV
 # ═══════════════════════════════════════════════════════════════════════════════
 
 loo = LeaveOneOut()
@@ -186,7 +186,7 @@ plt.close(fig)
 print(f"Saved : {out2.relative_to(REPO)}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part B — PCA + Ridge LOO-CV (same evaluation footing)
+# Part B: PCA + Ridge LOO-CV (same evaluation footing)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print()

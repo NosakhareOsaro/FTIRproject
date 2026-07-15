@@ -48,7 +48,7 @@ from sklearn.manifold import TSNE
 import matplotlib.lines as mlines
 
 # ---------------------------------------------------------------------------
-# MIRSPIPELINE — copied verbatim from scripts/FTIR-script.ipynb (cell 8)
+# MIRSPIPELINE: copied verbatim from scripts/FTIR-script.ipynb (cell 8)
 # ---------------------------------------------------------------------------
 
 def MIRSPIPELINE (data, testdata_presence, test_data, experiment, sex_dk, sensitives_file, resistants_file, feature2,

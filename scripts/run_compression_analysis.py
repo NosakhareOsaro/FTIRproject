@@ -5,13 +5,13 @@ Stage 1 of the two-stage pipeline: compress DGRP female FTIR spectra
 via PCA and examine alignment with starvation-resistance EMMeans.
 
 Parts:
-  A — PCA on individual fly spectra; explained-variance curve and
+  A: PCA on individual fly spectra; explained-variance curve and
       PC1 vs PC2 scatter coloured by EMMean.
-  B — Compare two collapse orderings:
+  B: Compare two collapse orderings:
         A: project all fly spectra to PCs, then average per DGRP line
         B: average raw spectra per DGRP line first, then run PCA
       Pearson r between PC1 and EMMeans is reported for both.
-  C — Print summary.
+  C: Print summary.
 
 Outputs written to results/DGRP/:
   pca_explained_variance.pdf
@@ -69,7 +69,7 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(spectra.values)  # n_flies × 1723
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part A — PCA on individual fly spectra
+# Part A: PCA on individual fly spectra
 # ═══════════════════════════════════════════════════════════════════════════════
 
 pca = PCA(n_components=N_COMPONENTS)
@@ -149,7 +149,7 @@ plt.close(fig)
 print(f"Saved : {out2.relative_to(REPO)}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part B — Two orderings of collapse
+# Part B: Two orderings of collapse
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # -- Order A: PCA first, then average PC scores per DGRP line
@@ -181,7 +181,7 @@ line_B   = line_B.merge(
 )
 r_B, p_B = pearsonr(line_B["PC1_B"], line_B["emmean"])
 
-# ── Plot 3: Order B — line-mean PC1 vs PC2 coloured by EMMean ────────────────
+# ── Plot 3: Order B: line-mean PC1 vs PC2 coloured by EMMean ────────────────
 
 pct1_B = pca_B.explained_variance_ratio_[0] * 100
 pct2_B = pca_B.explained_variance_ratio_[1] * 100
@@ -221,7 +221,7 @@ plt.close(fig)
 print(f"Saved : {out3.relative_to(REPO)}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Part C — Summary
+# Part C: Summary
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print()

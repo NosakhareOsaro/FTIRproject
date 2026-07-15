@@ -2,7 +2,7 @@
 run_fecundity_enet.py
 
 Elastic net regression predicting lifetime fecundity from DGRP FTIR spectra.
-Second phenotype after starvation resistance — tests whether spectral signal
+Second phenotype after starvation resistance: tests whether spectral signal
 generalises beyond the primary training-target phenotype.
 
 Phenotype source:
@@ -15,13 +15,13 @@ Overlap: 96 of 108 spectral lines have a fecundity mean; 12 dropped (no phenotyp
 
 CV design: LeaveOneOut over 96 lines. StandardScaler fitted on 95 training
 lines inside each fold. ElasticNetCV(cv=3, l1_ratio=[0.5,0.9,1.0], alphas=30,
-max_iter=5000, tol=0.01) — identical hyperparameter setup to the starvation
+max_iter=5000, tol=0.01), identical hyperparameter setup to the starvation
 resistance analysis in run_regularised_regression.py.
 
 RESULT INTERPRETATION NOTE:
   The model predicts approximately the training mean for every test point
   (SD of predictions ≈ 2.8 vs true SD ≈ 19.9). Elastic net selects very high
-  regularisation, driving all coefficients near zero — indicating no detectable
+  regularisation, driving all coefficients near zero, indicating no detectable
   spectral signal for lifetime fecundity.
 
   As a consequence, Spearman ρ is UNRELIABLE here and should not be reported:

@@ -2,8 +2,8 @@
 ftir_loader.py
 
 Load any of the six FTIR .dat files. Returns a (meta, spectra) tuple:
-  meta    — normalised metadata, columns vary by file
-  spectra — absorbance matrix, columns are wavenumber integers (3900 → 456 cm⁻¹)
+  meta    : normalised metadata, columns vary by file
+  spectra : absorbance matrix, columns are wavenumber integers (3900 → 456 cm⁻¹)
 
 Both DataFrames share the same 0-based integer index (row = one fly spectrum).
 """
@@ -36,7 +36,7 @@ _AGE_MAP = {
 }
 
 # Sex: F/M are unambiguous.
-# 'S' appears only in Diet1FTIR.dat — confirmed female by data owner (Rita Ibrahim).
+# 'S' appears only in Diet1FTIR.dat: confirmed female by data owner (Rita Ibrahim).
 _SEX_MAP = {
     "F": "F",
     "M": "M",
@@ -46,8 +46,8 @@ _SEX_MAP = {
 # Genot. is left unnormalised because values are experiment-specific:
 #   DGRP lines  : DGRP100, DGRP405, …  (108 inbred lines)
 #   Mito-nuclear: AA1/AA2/AA3, AB1/…, BA1/…, BB1/…  (SexGeno experiment)
-#   Lab stocks  : WDH (likely wDah/Dahomey w1118 background — confirm with data owner)
-#                 DPM (identity unknown — confirm with data owner)
+#   Lab stocks  : WDH (likely wDah/Dahomey w1118 background, confirm with data owner)
+#                 DPM (identity unknown, confirm with data owner)
 # TODO: confirm WDH and DPM stock identities with Dr Rita Ibrahim.
 
 # Verified from all six files: 3900, 3898, …, 456 step -2

@@ -11,12 +11,12 @@ Usage:
       [--sex F] --study "Morgante 2015" --phenotype "Starvation resistance"
 
 Validation hierarchy (see phenotype-data/README.md):
-  S00_EMMeans_starvation.tsv  — our own EMMeans reformatted as a mock
+  S00_EMMeans_starvation.tsv  : our own EMMeans reformatted as a mock
                                  DGRPool TSV. This is the smoke test:
                                  it should reproduce CV R² ≈ 0.673,
                                  confirming the script is correct.
   S24_StarvationRes_summary_mean.tsv (Morgante 2015) and all other
-  DGRPool files — genuine external phenotypes. Whatever R² comes out
+  DGRPool files: genuine external phenotypes. Whatever R² comes out
   is a real result, not expected to match 0.673.
 
 Each run appends one row to results/DGRP/dgrpool_phenotype_summary.csv

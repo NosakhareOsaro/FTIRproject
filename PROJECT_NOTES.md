@@ -13,27 +13,27 @@ evaluation design so any assistant starting fresh has the full picture.
 ## 1. What this project is
 
 MSc dissertation. Working title: _Machine Learning Signatures of Microbiome
-Perturbation_ (the official title is broader than the actual work — see below).
+Perturbation_ (the official title is broader than the actual work, see below).
 
-**Actual focus:** comprehensive exploration of multivariate methods for
+**Actual focus:** thorough exploration of multivariate methods for
 phenotype prediction from FTIR spectra in _Drosophila melanogaster_. The
 core question is: can we generate continuous vectors from spectra that
 reliably predict phenotype in individuals not seen during training? This
 builds directly on a lab pre-print (Ibrahim et al., bioRxiv 2026,
-doi:10.64898/2026.03.22.713522) — "chemotyping" — which uses ATR-FTIR + ML
+doi:10.64898/2026.03.22.713522), nicknamed "chemotyping", which uses ATR-FTIR + ML
 to classify biological variation and predict starvation resistance.
 
-**Framing:** the project is now "explore the method space comprehensively"
+**Framing:** the project is now "explore the method space thoroughly"
 rather than "test a specific hypothesis." The FTIR/DGRP work is the primary
 case study. Methods span dimensionality reduction (PCA, tSNE), methods that
 do both reduction and prediction (PLS-DA, sPLS-DA), and direct prediction
 (LASSO, ridge regression, elastic net, random forest). Regularised/frequentist
 methods (PLS-DA, elastic net, LASSO) serve as baselines within the broader
-comparison — the frequentist angle is not abandoned, just embedded in a wider
+comparison: the frequentist angle is not abandoned, just embedded in a wider
 sweep. Common evaluation yardstick: held-out prediction performance (R² for
 continuous targets, accuracy for discrete). A set of external clinical cohorts
 (NoMIC, EATRIS-Plus, ROP, IBD, IMPACC, CMAISE) are referenced as motivation
-only, not worked through — unless time allows after the FTIR work.
+only, not worked through, unless time allows after the FTIR work.
 
 ---
 
@@ -43,15 +43,15 @@ The pre-print has two limitations that this project addresses:
 
 1. **No frequentist baseline.** It compares five ML classifiers (LR, SVM, kNN,
    RF, XGBoost) only to each other. It does NOT include PLS-DA or PLS
-   regression — the field-standard chemometric baseline. Given the strong
+   regression: the field-standard chemometric baseline. Given the strong
    colinearity in spectral data, PLS is the natural comparator and its absence
    is a real gap. (Supervisor explicitly endorsed adding it.)
 
 2. **Continuous outcomes collapsed to categories.** Every continuous or ordinal
    outcome is discretised before ML: starvation resistance (continuous EMMeans
    → 20th/80th percentile binary), dietary restriction (5/10/20% yeast →
-   3-class), age (9d/4wk/6wk → 3-class). The paper's own thesis — "chemical
-   state encodes biological state" — is fundamentally a continuous claim, so
+   3-class), age (9d/4wk/6wk → 3-class). The paper's own thesis, "chemical
+   state encodes biological state," is fundamentally a continuous claim, so
    regression is a more principled test of it than classification.
 
 ---
@@ -70,8 +70,8 @@ The pre-print has two limitations that this project addresses:
    Two evaluation settings: (a) per-fly spectra with line-stratified CV,
    (b) collapsed mean spectrum per DGRP line.
 3. **Extend to other DGRPool phenotypes** (lifespan, fecundity, age at
-   measurement). The DGRP panel has extensive public phenotype data —
-   https://dgrpool.epfl.ch/ — so the same spectra can be tested against many
+   measurement). The DGRP panel has extensive public phenotype data
+   (https://dgrpool.epfl.ch/), so the same spectra can be tested against many
    continuous targets. Starvation resistance remains the positive control
    (signal is confirmed to be there).
 
@@ -79,7 +79,7 @@ The pre-print has two limitations that this project addresses:
 
 ## 4. CRITICAL: evaluation design (do not get this wrong)
 
-Both the FTIR assay and the starvation assay are **destructive** — the same
+Both the FTIR assay and the starvation assay are **destructive**: the same
 fly cannot be measured for both. So FTIR spectra and phenotype can only be
 linked at the **line (genotype) level**, not the individual fly level.
 
@@ -91,7 +91,7 @@ Consequences for the pipeline:
 - **Cross-validation:** MUST be **line-stratified** (group k-fold by DGRP line).
   No fly from a given line may appear in both train and test folds. Random
   fly-level CV would leak the line-level target across folds and inflate
-  performance — this is the single most important correctness requirement.
+  performance; this is the single most important correctness requirement.
 - **Evaluation:** collapse per-fly predictions to the line level (average
   predictions within each test-fold line → one prediction per line), then
   compute metrics against that line's true EMMean.
@@ -109,7 +109,7 @@ explicitly AND understood well enough to defend in the viva.
 Repo: github.com/r-ib-code/FTIRproject (Rita Ibrahim).
 As of 15 June 2026 all spectral files contain real data (earlier versions had
 empty placeholders; Rita re-uploaded). Sample counts verified against the
-pre-print figures — they match.
+pre-print figures: they match.
 
 | File                         | Spectra | Experiment                           |
 | ---------------------------- | ------- | ------------------------------------ |
@@ -122,7 +122,7 @@ pre-print figures — they match.
 
 **File format:** tab-separated. First 4-5 columns are metadata
 (`Genot.`, `Sex`, `Age`, `Diet`, sometimes `StoTime`), then ~1,723 wavenumber
-columns running from 3900 down to ~456 cm⁻¹. Column count varies (1727 vs 1728) depending on whether `StoTime` is present — the loader must handle both.
+columns running from 3900 down to ~456 cm⁻¹. Column count varies (1727 vs 1728) depending on whether `StoTime` is present: the loader must handle both.
 
 **Metadata coding is inconsistent and needs normalising** in the loader:
 
@@ -132,26 +132,26 @@ columns running from 3900 down to ~456 cm⁻¹. Column count varies (1727 vs 172
 
 Phenotype data:
 
-- `Survival-data/DGRP-starvationresistance.csv` — individual fly survival
+- `Survival-data/DGRP-starvationresistance.csv`: individual fly survival
   events (2,887 rows) → fed into the R survival model.
-- `Survival-data/Diet2-lifespan.csv`, `Fecundity-data/Diet2-fecundity.csv` —
+- `Survival-data/Diet2-lifespan.csv`, `Fecundity-data/Diet2-fecundity.csv`:
   other phenotypes.
 
 ---
 
 ## 6. Existing code in the repo
 
-- `scripts/DGRP_survival_analysis.R` — fits a parametric survival model
+- `scripts/DGRP_survival_analysis.R`: fits a parametric survival model
   (rms::psm, logistic dist) across the 108 DGRP lines, extracts EMMeans per
   line (the continuous starvation-resistance coefficient → `Emmeans.csv`),
   then bins at 20th/80th percentiles into sensitive/resistant. Also runs tSNE.
   **The EMMeans this produces are the regression target.**
-- `scripts/FTIR-script.ipynb` — one big `MIRSPIPELINE()` function (by Rita
+- `scripts/FTIR-script.ipynb`: one big `MIRSPIPELINE()` function (by Rita
   Ibrahim & Mario Gonzalez Jimenez). Handles all experiments. XGBoost for
   feature (wavenumber) selection, then trains 5 classifiers with GridSearchCV,
-  evaluates with stratified k=20 CV. All CLASSIFIERS — no regressors.
+  evaluates with stratified k=20 CV. All CLASSIFIERS, no regressors.
 - Upstream QC uses the `bad-blood` package
-  (github.com/magonji/bad-blood) — discards low-intensity spectra, atmospheric
+  (github.com/magonji/bad-blood): discards low-intensity spectra, atmospheric
   interference, etc. CHECK whether the .dat files are already QC'd or whether
   this needs running first.
 
@@ -164,7 +164,7 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
 1. **[DONE] Reproduce Rita's classification baseline** on `DGRPFTIR.dat`.
    Recovered ~88.5% resistant / ~83.9% sensitive SVM reclassification
    (paper: 88% / 84%). Gate passed.
-2. **[DONE] Write a clean data loader** (`scripts/ftir_loader.py`) — reads
+2. **[DONE] Write a clean data loader** (`scripts/ftir_loader.py`): reads
    any of the 6 .dat files, normalises messy metadata, validates wavenumber
    axis.
 3. **[DONE] Reproduce the R survival analysis** to regenerate `Emmeans.csv`
@@ -173,11 +173,11 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    zero-padded Morgante IDs like `DGRP_021`).
 4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
    (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
-5. **[IN PROGRESS] Extend to other DGRPool phenotypes** — produce a shortlist of
+5. **[IN PROGRESS] Extend to other DGRPool phenotypes**: produce a shortlist of
    well-measured continuous phenotypes, run the same pipeline, assess whether
    spectral signal generalises beyond starvation resistance. Lifetime fecundity
    tested first (see §7b); no signal found.
-6. **Meeting with Vinny Davies** (mathematician, potential collaborator) —
+6. **Meeting with Vinny Davies** (mathematician, potential collaborator):
    Monday 29 June 2026, 2 pm. No fixed agenda; may shape the mathematical
    approach, particularly around how to compare dimensionality-reduction
    methods with direct prediction methods, and whether Bayesian/GP approaches
@@ -189,16 +189,16 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
 
 ### PCA compression (`scripts/run_compression_analysis.py`)
 
-- **Individual-fly PCA (Order A):** PC1 vs EMMean r = −0.05, p = 0.61 —
+- **Individual-fly PCA (Order A):** PC1 vs EMMean r = −0.05, p = 0.61:
   within-line noise swamps the genotype signal when PCA is fitted on all
   ~1,772 individual fly spectra.
 - **Line-mean PCA (Order B):** averaging ~16 spectra per line first cancels
   within-line noise; PC1 of the 108-line-mean matrix vs EMMean r = +0.685,
   p = 2.92e−16. **Order B is the correct collapse order.**
-- **Dimensionality:** only 4 PCs reach 95% explained variance — FTIR spectra
+- **Dimensionality:** only 4 PCs reach 95% explained variance: FTIR spectra
   of _Drosophila_ are very low-dimensional (PC1 = 53.6%, PC2 = 32.2%).
 
-### Method comparison — LOO-CV on 108 DGRP line-mean spectra
+### Method comparison: LOO-CV on 108 DGRP line-mean spectra
 
 All methods use StandardScaler fitted inside each training fold. α/hyperparameters
 selected by inner CV within the training fold only (test line never seen).
@@ -214,14 +214,14 @@ selected by inner CV within the training fold only (test line never seen).
 
 **Key finding:** Direct sparse regression (elastic net, LASSO) on raw spectra
 outperforms all other methods. Random forest (R²=0.540) performs similarly to
-PCA+Ridge — the non-linear ensemble offers no advantage over linear methods
+PCA+Ridge: the non-linear ensemble offers no advantage over linear methods
 here, consistent with spectral data being highly collinear and the signal being
 largely captured by a few broad spectral regions rather than non-linear
 interactions. The L1 penalty is a more efficient compression for this phenotype
 prediction task than either PLS latent structure or RF tree splits.
 
 **PLS model selection:** performance peaks at n=10 components (CV R²=0.623) and
-declines at n=15 (0.550) and n=20 (0.515) — classic overfitting with n=108
+declines at n=15 (0.550) and n=20 (0.515), classic overfitting with n=108
 lines.
 
 **PLS loading vector:** prediction driven primarily by the C–H stretching region
@@ -234,7 +234,7 @@ correlate of starvation resistance.
 
 **Still to do on line-mean setting:** SVR, tSNE (visualisation). Random forest done (see table above).
 
-### Per-fly pipeline — GroupKFold(10) (`scripts/run_perfly_pipeline.py`)
+### Per-fly pipeline: GroupKFold(10) (`scripts/run_perfly_pipeline.py`)
 
 Training unit: individual fly spectra (~1,772 females). Outer CV:
 GroupKFold(n_splits=10) with DGRP line as the group (no fly from a given line
@@ -251,12 +251,12 @@ EMMeans. This is the dissertation-grade evaluation.
 
 **Key finding:** PLS wins the per-fly setting (ranking inverted vs line-mean
 LOO-CV, where sparse models dominated). The L1 sparse models drop ~0.15 R²
-relative to their line-mean performance — they appear to overfit to
+relative to their line-mean performance; they appear to overfit to
 individual-fly spectral variation that does not generalise across lines.
 All four methods are tightly clustered (line R² 0.515–0.534), suggesting
 within-line noise is the dominant bottleneck rather than model class.
 
-Per-fly R² (before line-averaging) is much lower (0.31–0.36) — this is
+Per-fly R² (before line-averaging) is much lower (0.31–0.36); this is
 expected: within-line spectral noise is real and cannot be learned from
 line-level targets. The line R² values above are the correct dissertation
 metric. Results also saved to `results/DGRP/perfly_metrics.csv`.
@@ -282,7 +282,7 @@ true SD ≈ 19.9). Elastic net selects maximum regularisation, driving all
 coefficients near zero. R² = −0.109 (worse than a mean baseline).
 
 **Methodological note on Spearman ρ:** the raw LOO output shows ρ ≈ −1, which
-is a numerical artefact — with near-constant predictions, the LOO mean-shift
+is a numerical artefact: with near-constant predictions, the LOO mean-shift
 effect dominates (holding out a high-fecundity line slightly lowers the training
 mean, so the model predicts slightly lower for high-true lines → artificial
 monotone negative trend). ρ is not reported for this result; R² is the correct
@@ -292,7 +292,7 @@ metric. The starvation/fecundity cross-phenotype correlation is only ρ = −0.0
 **Interpretation:** the FTIR spectral signal is specific to starvation
 resistance (and its biochemical correlates, primarily lipid content), and does
 not generalise to lifetime fecundity. This is a meaningful negative result for
-the dissertation — it rules out the FTIR chemotype being a generic indicator of
+the dissertation: it rules out the FTIR chemotype being a generic indicator of
 all life-history variation.
 
 ---
@@ -306,8 +306,8 @@ resistance. Each run appends one row to
 `results/DGRP/dgrpool_phenotype_summary.csv`, so results accumulate
 automatically across phenotypes.
 
-**Validation:** run first against `S00_EMMeans_starvation.tsv` — our own
-EMMeans reformatted as a mock DGRPool TSV — to confirm the script reproduces
+**Validation:** run first against `S00_EMMeans_starvation.tsv` (our own
+EMMeans reformatted as a mock DGRPool TSV) to confirm the script reproduces
 the known result (R²≈0.673) before trusting it on real external phenotypes.
 
 | Phenotype                                   | Study              | n lines | Elastic net CV R² | RMSE   | Spearman ρ        |
@@ -323,22 +323,22 @@ the known result (R²≈0.673) before trusting it on real external phenotypes.
 is correct.
 
 **Morgante starvation resistance (cross-lab validation):** R²=+0.041 is far
-weaker than our own EMMeans (R²=0.673), but this is expected — Morgante's
+weaker than our own EMMeans (R²=0.673), but this is expected: Morgante's
 measurement is an independent, noisy replicate of the same phenotype in a
 different lab, not the same target the model was fitted against. The
 line-level correlation between our EMMeans and Morgante's means is only
 Pearson r=0.428 (p=5.88e-06; see `scripts/check_morgante_overlap.py`), so a
 model trained on one is not expected to predict the other well even before
-FTIR enters the picture. (Overlap was corrected 2026-07-03 from 93→104 lines —
+FTIR enters the picture. (Overlap was corrected 2026-07-03 from 93→104 lines:
 the original script under-normalised zero-padded Morgante IDs.)
 
-**Lifespan, chill coma recovery, cuticle HC n-C25 — no spectral signal.** All
+**Lifespan, chill coma recovery, cuticle HC n-C25: no spectral signal.** All
 three show negative CV R² with predictions collapsing to the training mean
 (see per-run notes in `phenotype-data/README.md`). The cuticle HC null result
 is the most notable: cuticular hydrocarbons are the most mechanistically
 direct cuticle-surface measurement tested against the FTIR chemotype, yet no
 signal is detected. Combined with the fecundity, lifespan, and chill coma
-nulls, this sharpens the picture from markdown 06 — the FTIR signal so far
+nulls, this sharpens the picture from markdown 06: the FTIR signal so far
 appears specific to starvation resistance itself (or its EMMean
 representation), not to lipid content or cuticle chemistry as a general
 category. This narrows rather than confirms the original lipid-metabolism
@@ -359,9 +359,7 @@ R 4.4.2: rms, survival, emmeans, MASS, car, Rtsne, ggplot2.
 - FAIR principles: everything reproducible, version-controlled, documented.
 - Keep code in git; commit incrementally with clear messages.
 - This is assessed work. Every part of the pipeline must be understood and
-  defensible by the author — use AI assistance to accelerate and learn, not to
-  outsource understanding. Be transparent with the supervisor about tool use,
-  and check programme rules on AI use in assessed work.
+  defensible by the author.
 
 ---
 
