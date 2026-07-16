@@ -10,6 +10,13 @@ Usage:
   .venv/bin/python scripts/run_dgrpool_phenotype.py <phenotype.tsv> \\
       [--sex F] --study "Morgante 2015" --phenotype "Starvation resistance"
 
+--sex filters the phenotype TSV; --spectral-sex filters the FTIR data
+(default F, since DGRPFTIR.dat is female-only). They differ for
+cross-sex comparisons, e.g. male phenotype vs female spectra matched
+by DGRP line:
+  .venv/bin/python scripts/run_dgrpool_phenotype.py <male_phenotype.tsv> \\
+      --sex M --study "Unckless 2015" --phenotype "Triglyceride (male, pooled diet)"
+
 Validation hierarchy (see phenotype-data/README.md):
   S00_EMMeans_starvation.tsv  : our own EMMeans reformatted as a mock
                                  DGRPool TSV. This is the smoke test:
@@ -67,7 +74,9 @@ def main():
         "against any DGRPool-format phenotype TSV (columns: DGRP, sex, value)."
     )
     parser.add_argument("tsv_path", type=Path, help="Path to the DGRPool phenotype TSV")
-    parser.add_argument("--sex", default="F", help="Sex to filter to (default: F)")
+    parser.add_argument("--sex", default="F", help="Sex to filter the phenotype TSV to (default: F)")
+    parser.add_argument("--spectral-sex", default="F",
+                         help="Sex to filter the FTIR spectra to (default: F; DGRPFTIR.dat is female-only)")
     parser.add_argument("--study", required=True, help="Study label, e.g. 'Morgante 2015'")
     parser.add_argument("--phenotype", required=True, help="Phenotype label, e.g. 'Starvation resistance'")
     args = parser.parse_args()
@@ -80,7 +89,7 @@ def main():
 
     # ── Load spectral data, filter to sex, average per line ──────────────────
     meta, spectra = load_ftir(REPO / "FTIR-data" / "DGRPFTIR.dat")
-    sex_mask = meta["Sex"] == args.sex
+    sex_mask = meta["Sex"] == args.spectral_sex
     meta = meta[sex_mask].reset_index(drop=True)
     spectra = spectra[sex_mask].reset_index(drop=True)
 
@@ -101,9 +110,13 @@ def main():
     print(f"Phenotype : {args.phenotype}")
     print(f"Study     : {args.study}")
     print(f"File      : {args.tsv_path}")
-    print(f"Sex       : {args.sex}")
+    print(f"Sex       : phenotype={args.sex}, spectra={args.spectral_sex}")
+    if args.sex != args.spectral_sex:
+        print(f"*** CROSS-SEX COMPARISON: phenotype sex ({args.sex}) differs from "
+              f"spectral sex ({args.spectral_sex}). Lines are matched by DGRP "
+              f"genotype only, not by matched sex. ***")
     print("-" * 68)
-    print(f"Spectral lines ({args.sex})         : {len(spectral_lines)}")
+    print(f"Spectral lines ({args.spectral_sex})        : {len(spectral_lines)}")
     print(f"Phenotype lines ({args.sex})        : {len(pheno_lines)}")
     print(f"Overlap                       : {n_lines}")
     if missing_from_pheno:
