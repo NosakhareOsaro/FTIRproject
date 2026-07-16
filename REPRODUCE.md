@@ -1,5 +1,15 @@
 # Reproducing this project
 
+> **Maintenance note:** this file must be updated whenever a new analysis
+> script is added or a new phenotype is run through the pipeline. Add the
+> exact command, expected outputs, and approximate runtime as a new step
+> at the end of the relevant section. This file should always reflect
+> every command that has actually been run and committed to this
+> repository, in the order it was run. (Section 7 has already been
+> revised once, when `prepare_unckless_data.py` was extended to cover
+> the diet-specific columns as well as pooled-diet: an example of this
+> maintenance practice in action, not just a description of it.)
+
 This document lists every command needed to reproduce the results in this
 repository from a fresh clone, in the order the analyses were originally
 run. All commands assume your working directory is the repository root.
@@ -306,21 +316,27 @@ phenotype-data/raw/016477_tables2.xlsx
 .venv/bin/python scripts/prepare_unckless_data.py
 ```
 
-Extracts the `_pooled` column for six metabolic measures (glucose,
-glycerol, glycogen, triglyceride, protein, mean weight), drops rows with
-missing (`.`) values, reformats DGRP line IDs to match our spectral
-convention, and hardcodes `sex=M` (all Unckless measures were assayed in
-pools of 10 adult males per line, per the paper's Materials and Methods).
+Extracts three source columns per metabolic measure (glucose, glycerol,
+glycogen, triglyceride, protein, mean weight): `_pooled`, `_high_glucose`,
+and `_low_glucose` (the two single-diet conditions), for 18 output files
+total. Drops rows with missing (`.`) values independently per column,
+reformats DGRP line IDs to match our spectral convention, and hardcodes
+`sex=M` (all Unckless measures were assayed in pools of 10 adult males per
+line, per the paper's Materials and Methods).
 
-**Output:** `phenotype-data/Unckless_Glucose_pooled.tsv`,
-`Unckless_Glycerol_pooled.tsv`, `Unckless_Glycogen_pooled.tsv`,
-`Unckless_Triglyceride_pooled.tsv`, `Unckless_Protein_pooled.tsv`,
-`Unckless_MeanWeight_pooled.tsv` (all in `phenotype-data/`), 145 valid rows
-each (153 source rows, minus 7 missing values and 1 duplicate line, dropped
-identically across all six measures).
+**Output:** for each of the six measures, `Unckless_<Measure>_pooled.tsv`,
+`Unckless_<Measure>_highglucose.tsv`, and `Unckless_<Measure>_lowglucose.tsv`
+(18 files total, all in `phenotype-data/`). Row counts differ by diet
+condition, not by measure, because a different set of DGRP lines failed
+the assay under each diet: 145 valid rows for pooled (153 source rows,
+minus 7 missing values and 1 duplicate line), 147 for high-glucose (minus
+5 missing values and the same duplicate line), 150 for low-glucose (minus
+2 missing values and the same duplicate line). The missing/duplicate lines
+are dropped identically across all six measures within a given diet
+condition.
 **Time:** a few seconds.
 
-### 7.3 Run each measure through the general-purpose runner
+### 7.3 Run each pooled-diet measure through the general-purpose runner
 
 Because the FTIR spectra used here (`DGRPFTIR.dat`) are female-only, these
 are necessarily cross-sex comparisons (male metabolic phenotype vs. female
@@ -356,6 +372,70 @@ will print the cross-sex warning for every run below.
 
 Each of the six overlaps to 77 lines (108 female spectral lines ∩ 145 male
 phenotype lines).
+
+### 7.4 Run each diet-specific measure through the general-purpose runner
+
+Same cross-sex setup as Section 7.3 (`--sex M`, `--spectral-sex` left at
+its default `F`), but against the single-diet columns extracted in
+Section 7.2. Run in the order below: triglyceride and glycerol first
+(both diets), as the most theoretically informative given the pooled
+results, then the remaining four measures, both diets each.
+
+```bash
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Triglyceride_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Triglyceride (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Triglyceride_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Triglyceride (male, low-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glycerol_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glycerol (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glycerol_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glycerol (male, low-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glucose_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glucose (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glucose_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glucose (male, low-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glycogen_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glycogen (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Glycogen_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Glycogen (male, low-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Protein_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Protein (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_Protein_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "Protein (male, low-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_MeanWeight_highglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "MeanWeight (male, high-glucose diet)"
+
+.venv/bin/python scripts/run_dgrpool_phenotype.py \
+  phenotype-data/Unckless_MeanWeight_lowglucose.tsv \
+  --sex M --study "Unckless 2015" --phenotype "MeanWeight (male, low-glucose diet)"
+```
+
+Each of the six high-glucose files overlaps to 77 lines (108 female
+spectral lines ∩ 147 male phenotype lines); each of the six low-glucose
+files overlaps to 80 lines (108 ∩ 150). The overlap counts differ from
+the pooled-diet run (77 lines) because a different set of DGRP lines is
+present in each diet condition's file, not because of the measure.
 
 ---
 
