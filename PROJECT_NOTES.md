@@ -6,7 +6,7 @@ evaluation design so any assistant starting fresh has the full picture.
 
 **Author:** Nosakhare Odionfo Osaro (MSc Bioinformatics, University of Glasgow)
 **Supervisor:** Dr Adam Dobson
-**Last updated:** 25 June 2026
+**Last updated:** 18 July 2026
 
 ---
 
@@ -173,10 +173,12 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    zero-padded Morgante IDs like `DGRP_021`).
 4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
    (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
-5. **[IN PROGRESS] Extend to other DGRPool phenotypes**: produce a shortlist of
-   well-measured continuous phenotypes, run the same pipeline, assess whether
-   spectral signal generalises beyond starvation resistance. Lifetime fecundity
-   tested first (see §7b); no signal found.
+5. **[IN PROGRESS] Extend to other DGRPool phenotypes**: assess whether
+   spectral signal generalises beyond starvation resistance. Fecundity,
+   lifespan, chill coma recovery, and cuticle HC n-C25 tested (§7b, §7c): no
+   signal on any. Six Unckless et al. 2015 metabolic measures across three
+   diet conditions tested next at Adam's request (§7d): 17 of 18 null, one
+   weak unconfirmed candidate (protein, low-glucose diet).
 6. **Meeting with Vinny Davies** (mathematician, potential collaborator):
    Monday 29 June 2026, 2 pm. No fixed agenda; may shape the mathematical
    approach, particularly around how to compare dimensionality-reduction
@@ -343,6 +345,90 @@ appears specific to starvation resistance itself (or its EMMean
 representation), not to lipid content or cuticle chemistry as a general
 category. This narrows rather than confirms the original lipid-metabolism
 hypothesis and is worth discussing directly with Adam.
+
+---
+
+## 7d. Unckless metabolic cross-phenotype (15–18 Jul 2026)
+
+Task 4 from the 15 July meeting with Adam: markdowns 06/07 showed our FTIR
+spectra predict starvation resistance measured in our own lab, but not the
+same phenotype measured by another lab, and not any other trait tested so
+far. Adam asked whether the FTIR chemotype has any predictive power at all
+outside our own starvation assay, and sent over Unckless, Rottschaefer &
+Lazzaro (2015, G3, doi:10.1534/g3.114.016477), which measured six metabolic
+indices in the DGRP (glucose, glycerol, glycogen, triglyceride, protein, wet
+weight), each under pooled, high-glucose, and low-glucose diet conditions.
+See `notebooks/08_unckless_metabolic_crossphenotype.md` for the full
+writeup; summarised here.
+
+**Data problem found before any analysis:** the paper's Materials and
+Methods states all six measures were assayed in pools of 10 adult males per
+line. `DGRPFTIR.dat` is female-only. Every comparison here is necessarily
+cross-sex, matched by DGRP line/genotype, not by sex.
+
+**Bug found and fixed:** `run_dgrpool_phenotype.py` used a single `--sex`
+flag to filter both the phenotype file and the spectral data. Passing
+`--sex M` would have filtered the female-only spectra down to zero rows and
+aborted the run. Fixed by splitting into `--sex` (phenotype) and
+`--spectral-sex` (spectra, default `F`), with a console warning whenever the
+two differ. Default behaviour for every phenotype tested before this is
+unchanged (both were always `F`).
+
+**Pipeline audit run after the fix**, before trusting any new numbers from
+the script: (1) raw sex composition of all six previously-used phenotype
+files checked directly, confirmed no contamination despite three of the six
+containing both sexes at the file level; (2) DGRP line ID normalisation
+compared across `check_morgante_overlap.py`, `run_fecundity_enet.py`,
+`run_dgrpool_phenotype.py`, and `prepare_unckless_data.py`, confirmed
+identical output on sample IDs; (3) StandardScaler fit-on-training-fold-only
+discipline confirmed in all six scripts that run LOO-CV or GroupKFold; (4)
+the new cross-sex warning confirmed firing correctly on every Unckless run.
+
+`scripts/prepare_unckless_data.py` converts the paper's raw Table S2
+(`phenotype-data/raw/016477_tables2.xlsx`, not a DGRPool download) into 18
+TSVs: 6 measures × 3 diet conditions. 145 valid lines for pooled, 147 for
+high-glucose, 150 for low-glucose (missing values and one duplicate line
+dropped identically per diet condition, differs by diet not by measure).
+
+| Measure      | Diet         | n lines | CV R²  | Unckless r vs starvation |
+| ------------ | ------------ | ------- | ------ | ------------------------ |
+| Glucose      | all 3        | 77/77/80 | −0.026/−0.026/−0.048 | 0.246 (P<0.01) |
+| Glycerol     | all 3        | 77/77/80 | +0.012/+0.012/+0.007 | 0.079 (ns) |
+| Glycogen     | all 3        | 77/77/80 | −0.070/−0.045/−0.025 | 0.307 (P<0.001), strongest |
+| Triglyceride | all 3        | 77/77/80 | −0.051/−0.006/−0.030 | −0.071 (ns) |
+| Protein      | pooled/high  | 77/77   | −0.074/−0.026        | −0.113 (ns) |
+| **Protein**  | **low**      | **80**  | **+0.066**            | −0.113 (ns) |
+| MeanWeight   | all 3        | 77/77/80 | −0.026/−0.026/−0.032 | 0.241 (P<0.01), wet weight |
+
+17 of 18 tests are genuine nulls. `run_dgrpool_phenotype.py` now prints the
+prediction-SD/true-SD ratio on every run (not only when it drops below the
+0.2 collapse threshold, the original behaviour), which lets a collapsed null
+be distinguished from a null where predictions vary but simply aren't
+accurate. Both patterns show up here (see notebook 08 for the full
+per-measure breakdown).
+
+**Protein, low-glucose diet (R²=+0.066) checked separately.** Prediction
+SD/true SD ratio = 0.388, well above the 0.2 collapse threshold, so this is
+not a mean-collapse artefact the way most of the nulls are. It is still
+weak in absolute terms and uncorrected for multiple comparisons across the
+roughly two dozen phenotype/diet tests run in this project so far. Treated
+as a candidate for follow-up, not a finding.
+
+**Interpretation:** glycogen is the strongest published correlate of
+starvation resistance in the Unckless data itself (r=0.307, P<0.001,
+stronger than glucose or wet weight), and the FTIR spectra show no ability
+to predict it under any diet condition. If the FTIR chemotype tracked lipid
+or energy-storage status generally, glycogen is exactly what it should have
+picked up. Combined with the five phenotype targets in §7c, the signal now
+looks specific to this lab's own starvation assay rather than to metabolic
+status as a general category.
+
+**Running total across the whole project:** starvation resistance (own lab,
+R²=0.673, strong positive), starvation resistance (Morgante, R²=0.041, weak
+positive, consistent with cross-lab measurement noise), 21 other independent
+phenotype/diet tests showing no signal (fecundity, lifespan, chill coma,
+cuticle HC, and 17 of 18 Unckless measures/diets), and 1 weak, unconfirmed
+candidate (Unckless protein, low-glucose diet).
 
 ---
 

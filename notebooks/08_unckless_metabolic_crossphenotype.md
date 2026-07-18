@@ -6,10 +6,6 @@
 
 ---
 
-## What Adam asked for
-
-At the meeting on 15 July 2026, Adam set out the next task directly. Markdown 07 had shown that our FTIR spectra predict starvation resistance measured in our own lab, but not the same phenotype measured by another lab (Morgante 2015), and not any of the other traits tested so far (lifespan, chill coma recovery, cuticle hydrocarbons, fecundity). The open question was whether that pattern means the FTIR chemotype only tracks our specific starvation assay, or whether it has no predictive power for anything outside our own lab's data at all. As Adam put it: "the key thing would be to assess whether the FTIR spectra from our lab have any predictive power for other traits at all." He sent over a dataset from Unckless et al. 2015 to test this directly.
-
 ## Why the Unckless dataset
 
 Unckless, Rottschaefer and Lazzaro (2015) measured six metabolic indices across the DGRP panel: glucose, glycerol, glycogen, triglyceride, protein, and wet weight, each under two diet conditions (high-glucose and low-glucose) plus a pooled measure. This is a good test case for two reasons. First, it targets metabolic status directly rather than a downstream behavioural outcome like starvation survival, so it separates two possible explanations for the starvation result: does FTIR detect lipid and energy reserves generally, or does it only track the specific assay we run in this lab? Second, the paper reports its own correlations between these metabolic measures and starvation resistance (measured by Mackay et al. 2012), which gives an independent, published benchmark to compare against our own null results.
@@ -46,26 +42,26 @@ Finding one real bug in a script that had already produced five published-lookin
 
 Same model and hyperparameters as every other DGRPool phenotype run in this project: `ElasticNetCV(cv=3, l1_ratio=[0.5,0.7,0.9,0.95,1.0], alphas=30, max_iter=5000, tol=0.01)`, leave-one-line-out cross-validation, `StandardScaler` fitted inside each fold. The "Unckless r" column is their own published phenotypic correlation between that measure and starvation resistance (Table 1 of Unckless et al. 2015, correlated against starvation resistance as measured by Mackay et al. 2012), included for comparison since it is an independent check on which of these measures is actually expected to relate to starvation biology at all.
 
-| Measure | Diet | n lines | Our CV R² | Unckless r with starvation resistance | Result |
-|---|---|---|---|---|---|
-| Glucose | Pooled | 77 | -0.026 | 0.246 (P<0.01) | Null, predictions collapse to the mean |
-| Glucose | High-glucose | 77 | -0.026 | 0.246 (P<0.01) | Null, predictions collapse to the mean |
-| Glucose | Low-glucose | 80 | -0.048 | 0.246 (P<0.01) | Null, predictions collapse to the mean |
-| Glycerol | Pooled | 77 | +0.012 | 0.079 (ns) | Null, no collapse but no predictive power |
-| Glycerol | High-glucose | 77 | +0.012 | 0.079 (ns) | Null, no collapse but no predictive power |
-| Glycerol | Low-glucose | 80 | +0.007 | 0.079 (ns) | Null, predictions collapse to the mean |
-| Glycogen | Pooled | 77 | -0.070 | 0.307 (P<0.001) | Null, no collapse but no predictive power |
-| Glycogen | High-glucose | 77 | -0.045 | 0.307 (P<0.001) | Null, no collapse but no predictive power |
-| Glycogen | Low-glucose | 80 | -0.025 | 0.307 (P<0.001) | Null, predictions collapse to the mean |
-| Triglyceride | Pooled | 77 | -0.051 | -0.071 (ns) | Null, predictions collapse to the mean |
-| Triglyceride | High-glucose | 77 | -0.006 | -0.071 (ns) | Null, predictions collapse to the mean |
-| Triglyceride | Low-glucose | 80 | -0.030 | -0.071 (ns) | Null, predictions collapse to the mean |
-| Protein | Pooled | 77 | -0.074 | -0.113 (ns) | Null, predictions collapse to the mean |
-| Protein | High-glucose | 77 | -0.026 | -0.113 (ns) | Null, predictions collapse to the mean |
-| **Protein** | **Low-glucose** | **80** | **+0.066** | -0.113 (ns) | See below |
-| MeanWeight | Pooled | 77 | -0.026 | 0.241 (P<0.01), wet weight | Null, predictions collapse to the mean |
-| MeanWeight | High-glucose | 77 | -0.026 | 0.241 (P<0.01), wet weight | Null, predictions collapse to the mean |
-| MeanWeight | Low-glucose | 80 | -0.032 | 0.241 (P<0.01), wet weight | Null, predictions collapse to the mean |
+| Measure      | Diet            | n lines | Our CV R²  | Unckless r with starvation resistance | Result                                    |
+| ------------ | --------------- | ------- | ---------- | ------------------------------------- | ----------------------------------------- |
+| Glucose      | Pooled          | 77      | -0.026     | 0.246 (P<0.01)                        | Null, predictions collapse to the mean    |
+| Glucose      | High-glucose    | 77      | -0.026     | 0.246 (P<0.01)                        | Null, predictions collapse to the mean    |
+| Glucose      | Low-glucose     | 80      | -0.048     | 0.246 (P<0.01)                        | Null, predictions collapse to the mean    |
+| Glycerol     | Pooled          | 77      | +0.012     | 0.079 (ns)                            | Null, no collapse but no predictive power |
+| Glycerol     | High-glucose    | 77      | +0.012     | 0.079 (ns)                            | Null, no collapse but no predictive power |
+| Glycerol     | Low-glucose     | 80      | +0.007     | 0.079 (ns)                            | Null, predictions collapse to the mean    |
+| Glycogen     | Pooled          | 77      | -0.070     | 0.307 (P<0.001)                       | Null, no collapse but no predictive power |
+| Glycogen     | High-glucose    | 77      | -0.045     | 0.307 (P<0.001)                       | Null, no collapse but no predictive power |
+| Glycogen     | Low-glucose     | 80      | -0.025     | 0.307 (P<0.001)                       | Null, predictions collapse to the mean    |
+| Triglyceride | Pooled          | 77      | -0.051     | -0.071 (ns)                           | Null, predictions collapse to the mean    |
+| Triglyceride | High-glucose    | 77      | -0.006     | -0.071 (ns)                           | Null, predictions collapse to the mean    |
+| Triglyceride | Low-glucose     | 80      | -0.030     | -0.071 (ns)                           | Null, predictions collapse to the mean    |
+| Protein      | Pooled          | 77      | -0.074     | -0.113 (ns)                           | Null, predictions collapse to the mean    |
+| Protein      | High-glucose    | 77      | -0.026     | -0.113 (ns)                           | Null, predictions collapse to the mean    |
+| **Protein**  | **Low-glucose** | **80**  | **+0.066** | -0.113 (ns)                           | See below                                 |
+| MeanWeight   | Pooled          | 77      | -0.026     | 0.241 (P<0.01), wet weight            | Null, predictions collapse to the mean    |
+| MeanWeight   | High-glucose    | 77      | -0.026     | 0.241 (P<0.01), wet weight            | Null, predictions collapse to the mean    |
+| MeanWeight   | Low-glucose     | 80      | -0.032     | 0.241 (P<0.01), wet weight            | Null, predictions collapse to the mean    |
 
 "Collapse" is the same diagnostic used for the fecundity null in markdown 06: if the standard deviation of the LOO-CV predictions falls below 20% of the standard deviation of the true values, the model has effectively given up and is predicting close to the training mean rather than finding any structure. `run_dgrpool_phenotype.py` now prints this ratio on every run, not only when it drops below the threshold, so the distinction between a collapsed null and a non-collapsed null with genuinely weak predictive power can always be checked directly.
 
@@ -85,13 +81,13 @@ Combined with the five phenotype targets from markdown 07, where only starvation
 
 ## Running total across the project
 
-| Phenotype | Source | Result |
-|---|---|---|
-| Starvation resistance | Own lab EMMeans | Strong positive, R²=0.673 |
-| Starvation resistance | Morgante 2015 | Weak positive, R²=0.041, consistent with cross-lab measurement noise |
-| Fecundity, lifespan, chill coma recovery, cuticle HC n-C25 | DGRPool (4 tests) | Null |
-| Six Unckless metabolic measures, pooled and high/low-glucose diets | Unckless 2015 (17 of 18 tests) | Null |
-| Protein, low-glucose diet | Unckless 2015 (1 of 18 tests) | Weak, not a collapse artefact, unconfirmed |
+| Phenotype                                                          | Source                         | Result                                                               |
+| ------------------------------------------------------------------ | ------------------------------ | -------------------------------------------------------------------- |
+| Starvation resistance                                              | Own lab EMMeans                | Strong positive, R²=0.673                                            |
+| Starvation resistance                                              | Morgante 2015                  | Weak positive, R²=0.041, consistent with cross-lab measurement noise |
+| Fecundity, lifespan, chill coma recovery, cuticle HC n-C25         | DGRPool (4 tests)              | Null                                                                 |
+| Six Unckless metabolic measures, pooled and high/low-glucose diets | Unckless 2015 (17 of 18 tests) | Null                                                                 |
+| Protein, low-glucose diet                                          | Unckless 2015 (1 of 18 tests)  | Weak, not a collapse artefact, unconfirmed                           |
 
 24 distinct phenotype and diet combinations tested in total: 2 involving starvation resistance itself, 21 genuine nulls, and 1 weak candidate that has not been corrected for multiple comparisons and should not be treated as a finding.
 
