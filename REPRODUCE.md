@@ -239,6 +239,13 @@ DGRPool-format phenotype TSV (columns `DGRP`, `sex`, `value`). It takes
 female-only). The two only need to differ for cross-sex comparisons; a
 console warning prints automatically whenever they do.
 
+The RESULTS block also prints the prediction-SD/true-SD ratio on every
+run (not just when it drops below the 0.2 collapse threshold, which was
+the original behaviour). This lets you distinguish a genuine null where
+predictions collapse to the training mean from a null where predictions
+vary but simply aren't accurate, without needing a separate diagnostic
+script.
+
 Each run appends one row to `results/DGRP/dgrpool_phenotype_summary.csv`.
 
 **Time (timed):** every phenotype below took roughly 30–90 minutes in this
@@ -373,7 +380,15 @@ will print the cross-sex warning for every run below.
 Each of the six overlaps to 77 lines (108 female spectral lines ∩ 145 male
 phenotype lines).
 
-### 7.4 Run each diet-specific measure through the general-purpose runner
+### 7.4 Run each diet-specific measure through the general-purpose runner (verified)
+
+All 12 commands below have been run to completion; each produced exactly
+one row in `results/DGRP/dgrpool_phenotype_summary.csv`, in the same
+order as documented here, with no errors. See
+`phenotype-data/README.md` for the full 18-row results table (6 measures
+× pooled/high-glucose/low-glucose) and the diagnostic used to check
+whether the one non-null result (Protein, low-glucose) is a genuine
+signal or a collapse artifact.
 
 Same cross-sex setup as Section 7.3 (`--sex M`, `--spectral-sex` left at
 its default `F`), but against the single-diet columns extracted in

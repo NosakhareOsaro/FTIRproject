@@ -167,6 +167,7 @@ def main():
     print(f"  CV R²       : {r2:+.3f}")
     print(f"  RMSE        : {rmse:.4f}")
     print(f"  Spearman ρ  : {rho:+.3f}")
+    print(f"  Pred SD / true SD : {pred_sd:.4f} / {true_sd:.4f}  (ratio {pred_sd / true_sd:.3f})")
 
     collapsed = pred_sd < 0.2 * true_sd
     if collapsed:
