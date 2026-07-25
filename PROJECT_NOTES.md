@@ -1,12 +1,10 @@
 # PROJECT_NOTES.md
 
 Context file for working on this project locally.
-Drop this in the repo root. It summarises the agreed plan, data status, and
+It summarises the agreed plan, data status, and
 evaluation design so any assistant starting fresh has the full picture.
 
 **Author:** Nosakhare Odionfo Osaro (MSc Bioinformatics, University of Glasgow)
-**Supervisor:** Dr Adam Dobson
-**Last updated:** 18 July 2026
 
 ---
 
@@ -56,7 +54,7 @@ The pre-print has two limitations that this project addresses:
 
 ---
 
-## 3. The three contributions (agreed with supervisor, updated 24 Jun 2026)
+## 3. The three contributions
 
 1. **Systematic method comparison** across the full space of multivariate
    approaches: dimensionality reduction only (PCA, tSNE), methods that reduce
@@ -77,7 +75,7 @@ The pre-print has two limitations that this project addresses:
 
 ---
 
-## 4. CRITICAL: evaluation design (do not get this wrong)
+## 4. CRITICAL: evaluation design
 
 Both the FTIR assay and the starvation assay are **destructive**: the same
 fly cannot be measured for both. So FTIR spectra and phenotype can only be
@@ -157,7 +155,7 @@ Phenotype data:
 
 ---
 
-## 7. Work order (updated 25 Jun 2026)
+## 7. Work order
 
 Steps 1–4 complete. Steps 5–6 are the active frontier.
 
@@ -173,21 +171,16 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    zero-padded Morgante IDs like `DGRP_021`).
 4. **[DONE] Build the method-comparison pipeline** on line-mean spectra
    (108 lines × 1,723 wavenumbers, LOO-CV). See §7a for full results.
-5. **[IN PROGRESS] Extend to other DGRPool phenotypes**: assess whether
+5. **[DONE] Extend to other DGRPool phenotypes**: assess whether
    spectral signal generalises beyond starvation resistance. Fecundity,
    lifespan, chill coma recovery, and cuticle HC n-C25 tested (§7b, §7c): no
    signal on any. Six Unckless et al. 2015 metabolic measures across three
    diet conditions tested next at Adam's request (§7d): 17 of 18 null, one
    weak unconfirmed candidate (protein, low-glucose diet).
-6. **Meeting with Vinny Davies** (mathematician, potential collaborator):
-   Monday 29 June 2026, 2 pm. No fixed agenda; may shape the mathematical
-   approach, particularly around how to compare dimensionality-reduction
-   methods with direct prediction methods, and whether Bayesian/GP approaches
-   are worth adding given small N.
 
 ---
 
-## 7a. Results so far (25 Jun 2026)
+## 7a. Results so far
 
 ### PCA compression (`scripts/run_compression_analysis.py`)
 
@@ -265,7 +258,7 @@ metric. Results also saved to `results/DGRP/perfly_metrics.csv`.
 
 ---
 
-## 7b. Cross-phenotype results (25 Jun 2026)
+## 7b. Cross-phenotype results
 
 ### Lifetime fecundity (`scripts/run_fecundity_enet.py`)
 
@@ -299,7 +292,7 @@ all life-history variation.
 
 ---
 
-## 7c. General-purpose cross-phenotype pipeline (3–4 Jul 2026)
+## 7c. General-purpose cross-phenotype pipeline
 
 `scripts/run_dgrpool_phenotype.py` generalises the fecundity script into a
 command-line tool: any DGRPool-format phenotype TSV (`DGRP`, `sex`, `value`)
@@ -348,7 +341,7 @@ hypothesis and is worth discussing directly with Adam.
 
 ---
 
-## 7d. Unckless metabolic cross-phenotype (15–18 Jul 2026)
+## 7d. Unckless metabolic cross-phenotype
 
 Task 4 from the 15 July meeting with Adam: markdowns 06/07 showed our FTIR
 spectra predict starvation resistance measured in our own lab, but not the
@@ -390,15 +383,15 @@ TSVs: 6 measures × 3 diet conditions. 145 valid lines for pooled, 147 for
 high-glucose, 150 for low-glucose (missing values and one duplicate line
 dropped identically per diet condition, differs by diet not by measure).
 
-| Measure      | Diet         | n lines | CV R²  | Unckless r vs starvation |
-| ------------ | ------------ | ------- | ------ | ------------------------ |
-| Glucose      | all 3        | 77/77/80 | −0.026/−0.026/−0.048 | 0.246 (P<0.01) |
-| Glycerol     | all 3        | 77/77/80 | +0.012/+0.012/+0.007 | 0.079 (ns) |
-| Glycogen     | all 3        | 77/77/80 | −0.070/−0.045/−0.025 | 0.307 (P<0.001), strongest |
-| Triglyceride | all 3        | 77/77/80 | −0.051/−0.006/−0.030 | −0.071 (ns) |
-| Protein      | pooled/high  | 77/77   | −0.074/−0.026        | −0.113 (ns) |
-| **Protein**  | **low**      | **80**  | **+0.066**            | −0.113 (ns) |
-| MeanWeight   | all 3        | 77/77/80 | −0.026/−0.026/−0.032 | 0.241 (P<0.01), wet weight |
+| Measure      | Diet        | n lines  | CV R²                | Unckless r vs starvation   |
+| ------------ | ----------- | -------- | -------------------- | -------------------------- |
+| Glucose      | all 3       | 77/77/80 | −0.026/−0.026/−0.048 | 0.246 (P<0.01)             |
+| Glycerol     | all 3       | 77/77/80 | +0.012/+0.012/+0.007 | 0.079 (ns)                 |
+| Glycogen     | all 3       | 77/77/80 | −0.070/−0.045/−0.025 | 0.307 (P<0.001), strongest |
+| Triglyceride | all 3       | 77/77/80 | −0.051/−0.006/−0.030 | −0.071 (ns)                |
+| Protein      | pooled/high | 77/77    | −0.074/−0.026        | −0.113 (ns)                |
+| **Protein**  | **low**     | **80**   | **+0.066**           | −0.113 (ns)                |
+| MeanWeight   | all 3       | 77/77/80 | −0.026/−0.026/−0.032 | 0.241 (P<0.01), wet weight |
 
 17 of 18 tests are genuine nulls. `run_dgrpool_phenotype.py` now prints the
 prediction-SD/true-SD ratio on every run (not only when it drops below the
