@@ -1,6 +1,6 @@
 # 01: Baseline Reproduction
 
-**Script:** `scripts/run_survival_analysis.R` and `scripts/run_dgrp_baseline.py`
+**Script:** `scripts/run_survival_analysis.R` and `scripts/run_dgrp_baseline.py`.
 **Status:** Complete
 **Key result:** SVM reclassification 88.5% resistant / 83.9% sensitive, matching the pre-print exactly
 
@@ -68,11 +68,11 @@ Rita's Python notebook (`scripts/FTIR-script.ipynb`) contains a function called 
 
 The notebook was written for older library versions and crashed on three separate issues with modern Python libraries:
 
-| Problem                                                | Library        | Fix                                                    |
-| ------------------------------------------------------ | -------------- | ------------------------------------------------------ |
-| `plt.style.use('seaborn-poster')`, style name removed  | matplotlib 3.7 | Changed to `seaborn-v0_8-poster`                       |
-| `int(np.where(...)[0])`, broken in numpy 2.x           | numpy 2.x      | Changed to `int(np.where(...)[0][0])` (appeared twice) |
-| `ax.get_shared_y_axes().join(...)`, method removed     | matplotlib 3.7 | Removed (redundant with `vmin`/`vmax` already set)     |
+| Problem                                               | Library        | Fix                                                    |
+| ----------------------------------------------------- | -------------- | ------------------------------------------------------ |
+| `plt.style.use('seaborn-poster')`, style name removed | matplotlib 3.7 | Changed to `seaborn-v0_8-poster`                       |
+| `int(np.where(...)[0])`, broken in numpy 2.x          | numpy 2.x      | Changed to `int(np.where(...)[0][0])` (appeared twice) |
+| `ax.get_shared_y_axes().join(...)`, method removed    | matplotlib 3.7 | Removed (redundant with `vmin`/`vmax` already set)     |
 
 ### The fix
 

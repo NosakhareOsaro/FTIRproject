@@ -1,6 +1,6 @@
 # 05: Per-Fly Evaluation with Line-Stratified GroupKFold CV
 
-**Script:** `scripts/run_perfly_pipeline.py`
+**Script:** `scripts/run_perfly_pipeline.py`.
 **Status:** Complete
 **Key result:** PLS wins the per-fly setting (line-level R² = 0.534, ρ = +0.794), despite losing the line-mean setting. The ranking of methods inverts between the two evaluation settings.
 
@@ -37,6 +37,7 @@ With per-fly spectra, the same line-level discipline must be maintained. If flie
 **Outer CV:** `GroupKFold(n_splits=10)` with DGRP line as the group. 10 folds, each with approximately 10-11 test lines and 97-98 training lines (~1,590-1,600 training flies, ~170-180 test flies).
 
 **Inside each outer fold:**
+
 1. `StandardScaler` fitted on the training flies only (never the test flies)
 2. The model is trained on the scaled training fly spectra, with each fly's EMMean used as the training target (the same EMMean value repeated for all ~16 flies from the same line)
 3. The model predicts a score for each test fly
@@ -53,21 +54,21 @@ PLS requires selecting the number of components. Rather than fixing this in adva
 
 ### Line-level R² after per-fly averaging
 
-| Method | Line-level R² | Line RMSE | Spearman ρ | Pearson r |
-|---|---|---|---|---|
-| Ridge | 0.515 | 0.5130 | +0.767 | +0.764 |
-| LASSO | 0.517 | 0.5121 | +0.781 | +0.768 |
-| Elastic net | 0.518 | 0.5113 | +0.783 | +0.771 |
-| **PLS** | **0.534** | **0.5029** | **+0.794** | **+0.802** |
+| Method      | Line-level R² | Line RMSE  | Spearman ρ | Pearson r  |
+| ----------- | ------------- | ---------- | ---------- | ---------- |
+| Ridge       | 0.515         | 0.5130     | +0.767     | +0.764     |
+| LASSO       | 0.517         | 0.5121     | +0.781     | +0.768     |
+| Elastic net | 0.518         | 0.5113     | +0.783     | +0.771     |
+| **PLS**     | **0.534**     | **0.5029** | **+0.794** | **+0.802** |
 
 ### Per-fly R² (before line-level averaging)
 
-| Method | Per-fly R² |
-|---|---|
-| PLS | 0.360 |
-| Ridge | 0.309 |
-| LASSO | 0.327 |
-| Elastic net | 0.332 |
+| Method      | Per-fly R² |
+| ----------- | ---------- |
+| PLS         | 0.360      |
+| Ridge       | 0.309      |
+| LASSO       | 0.327      |
+| Elastic net | 0.332      |
 
 ---
 
@@ -87,12 +88,12 @@ In short: PLS is better at filtering noise during training; sparse linear method
 
 ## Comparison between evaluation settings
 
-| Method | Line-mean LOO-CV R² | Per-fly GroupKFold line R² | Drop |
-|---|---|---|---|
-| PLS | 0.623 | 0.534 | -0.089 |
-| Ridge | 0.635 | 0.515 | -0.120 |
-| LASSO | 0.669 | 0.517 | -0.152 |
-| Elastic net | 0.673 | 0.518 | -0.155 |
+| Method      | Line-mean LOO-CV R² | Per-fly GroupKFold line R² | Drop   |
+| ----------- | ------------------- | -------------------------- | ------ |
+| PLS         | 0.623               | 0.534                      | -0.089 |
+| Ridge       | 0.635               | 0.515                      | -0.120 |
+| LASSO       | 0.669               | 0.517                      | -0.152 |
+| Elastic net | 0.673               | 0.518                      | -0.155 |
 
 All methods perform worse in the per-fly setting than the line-mean setting. This is expected: the per-fly setting is harder, both because within-line noise is present during training and because GroupKFold(10) is a less generous evaluation than LOO. The drop is not a failure of the models; it quantifies the cost of within-line spectral noise and the benefit of pre-averaging.
 

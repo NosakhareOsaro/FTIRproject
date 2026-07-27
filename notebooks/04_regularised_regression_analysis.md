@@ -1,6 +1,6 @@
 # 04: Regularised Regression Analysis
 
-**Script:** `scripts/run_regularised_regression.py`
+**Script:** `scripts/run_regularised_regression.py`.
 **Status:** Complete
 **Key result:** Elastic net achieves CV R² = 0.673, Spearman ρ = +0.816, the best performance of all methods tested. Direct sparse regression on the raw 1,723 wavenumbers outperforms dimensionality-reduction-then-predict approaches (PLS, PCA+Ridge).
 
@@ -42,13 +42,13 @@ Identical LOO-CV structure to the PLS analysis: hold out one line, train on 107,
 
 ## Results
 
-| Method | CV R² | CV RMSE | Spearman ρ | Selected α |
-|---|---|---|---|---|
-| PCA + Ridge (from markdown 03) | 0.553 | 0.4927 | +0.743 | n/a |
-| PLS (from markdown 03) | 0.623 | 0.4524 | +0.801 | n/a |
-| Ridge (raw 1,723 wn) | 0.635 | 0.4451 | +0.809 | median α = 28.5 |
-| LASSO | 0.669 | 0.4266 | +0.813 | median α = 0.010 |
-| **Elastic net** | **0.673** | **0.4244** | **+0.816** | median α = 0.011, ℓ₁ = 0.90 |
+| Method                         | CV R²     | CV RMSE    | Spearman ρ | Selected α                  |
+| ------------------------------ | --------- | ---------- | ---------- | --------------------------- |
+| PCA + Ridge (from markdown 03) | 0.553     | 0.4927     | +0.743     | n/a                         |
+| PLS (from markdown 03)         | 0.623     | 0.4524     | +0.801     | n/a                         |
+| Ridge (raw 1,723 wn)           | 0.635     | 0.4451     | +0.809     | median α = 28.5             |
+| LASSO                          | 0.669     | 0.4266     | +0.813     | median α = 0.010            |
+| **Elastic net**                | **0.673** | **0.4244** | **+0.816** | median α = 0.011, ℓ₁ = 0.90 |
 
 All three regularised methods outperform PLS. Elastic net is the best overall method.
 
@@ -68,14 +68,14 @@ All three regularised methods outperform PLS. Elastic net is the best overall me
 
 ## Complete method comparison (line-mean spectra, LOO-CV)
 
-| Method | CV R² | CV RMSE | Spearman ρ |
-|---|---|---|---|
-| PCA + Ridge (4 PCs) | 0.553 | 0.4927 | +0.743 |
-| Random forest | 0.540 | 0.4998 | +0.729 |
-| PLS (10 components) | 0.623 | 0.4524 | +0.801 |
-| Ridge (raw spectra) | 0.635 | 0.4451 | +0.809 |
-| LASSO | 0.669 | 0.4266 | +0.813 |
-| **Elastic net** | **0.673** | **0.4244** | **+0.816** |
+| Method              | CV R²     | CV RMSE    | Spearman ρ |
+| ------------------- | --------- | ---------- | ---------- |
+| PCA + Ridge (4 PCs) | 0.553     | 0.4927     | +0.743     |
+| Random forest       | 0.540     | 0.4998     | +0.729     |
+| PLS (10 components) | 0.623     | 0.4524     | +0.801     |
+| Ridge (raw spectra) | 0.635     | 0.4451     | +0.809     |
+| LASSO               | 0.669     | 0.4266     | +0.813     |
+| **Elastic net**     | **0.673** | **0.4244** | **+0.816** |
 
 ---
 

@@ -1,6 +1,6 @@
 # 07: Cross-Phenotype Pipeline: General-Purpose DGRPool Runner
 
-**Script:** `scripts/run_dgrpool_phenotype.py`
+**Script:** `scripts/run_dgrpool_phenotype.py`.
 **Status:** Complete
 **Key result:** Across five phenotype targets, only starvation resistance shows a spectral signal (CV R² = 0.673 on our own EMMeans; +0.041 on an independent cross-lab replicate). Lifespan, chill coma recovery, and cuticle HC n-C25 are all null (CV R² between −0.05 and −0.06). The FTIR chemotype's predictive signal is highly specific, so the lipid-metabolism hypothesis from markdown 06 needs refining rather than abandoning.
 

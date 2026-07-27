@@ -1,6 +1,6 @@
 # 06: Cross-Phenotype Analysis: Lifetime Fecundity
 
-**Script:** `scripts/run_fecundity_enet.py`
+**Script:** `scripts/run_fecundity_enet.py`.
 **Status:** Complete
 **Key result:** Elastic net CV R² = −0.109 on lifetime fecundity, with no spectral signal detected. The FTIR chemotype does not predict fecundity, suggesting the spectral signal is specific to starvation resistance rather than a generic predictor of life-history variation.
 
@@ -56,10 +56,10 @@ The only changes from the starvation analysis are the phenotype target and the r
 
 ## Result
 
-| Phenotype | n lines | Elastic net CV R² | RMSE |
-|---|---|---|---|
-| Starvation resistance | 108 | +0.673 | 0.4244 |
-| **Lifetime fecundity** | **96** | **−0.109** | **20.913** |
+| Phenotype              | n lines | Elastic net CV R² | RMSE       |
+| ---------------------- | ------- | ----------------- | ---------- |
+| Starvation resistance  | 108     | +0.673            | 0.4244     |
+| **Lifetime fecundity** | **96**  | **−0.109**        | **20.913** |
 
 CV R² = −0.109 means the elastic net model predicts fecundity **worse than simply predicting the mean fecundity value for every line**. A model that always outputs the mean fecundity would achieve R² = 0 by definition. Negative R² indicates the predictions are actively worse than this naive baseline.
 
@@ -86,10 +86,10 @@ All three checks are consistent: there is genuinely no detectable spectral signa
 
 The contrast between the two phenotypes is stark and interpretable:
 
-| Phenotype | CV R² | Spectral signal? |
-|---|---|---|
-| Starvation resistance | +0.673 | Yes, strong |
-| Lifetime fecundity | −0.109 | No |
+| Phenotype             | CV R²  | Spectral signal? |
+| --------------------- | ------ | ---------------- |
+| Starvation resistance | +0.673 | Yes, strong      |
+| Lifetime fecundity    | −0.109 | No               |
 
 **Why starvation resistance but not fecundity?**
 

@@ -1,6 +1,6 @@
 # 02: PCA Compression Analysis
 
-**Script:** `scripts/run_compression_analysis.py`
+**Script:** `scripts/run_compression_analysis.py`.
 **Status:** Complete
 **Key result:** Line-mean PCA PC1 correlates r = +0.685 (p = 2.92×10⁻¹⁶) with starvation EMMeans. Individual-fly PCA gives r = −0.05 (p = 0.61), with no signal.
 
@@ -52,10 +52,10 @@ Average the raw spectra within each DGRP line first (108 lines × 1,723 wavenumb
 
 The question is whether the order matters. It does, dramatically.
 
-| Order | Pearson r (PC1 vs EMMean) | p-value | Signal? |
-|---|---|---|---|
-| A: PCA first, average after | −0.050 | 0.606 | No |
-| B: Average first, PCA after | **+0.685** | **2.92×10⁻¹⁶** | **Yes** |
+| Order                       | Pearson r (PC1 vs EMMean) | p-value        | Signal? |
+| --------------------------- | ------------------------- | -------------- | ------- |
+| A: PCA first, average after | −0.050                    | 0.606          | No      |
+| B: Average first, PCA after | **+0.685**                | **2.92×10⁻¹⁶** | **Yes** |
 
 **Why the difference is so large:**
 

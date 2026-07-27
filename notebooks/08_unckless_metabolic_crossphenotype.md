@@ -1,6 +1,6 @@
 # 08: Unckless Metabolic Cross-Phenotype Analysis
 
-**Script:** `scripts/prepare_unckless_data.py`, `scripts/run_dgrpool_phenotype.py`
+**Script:** `scripts/prepare_unckless_data.py`, `scripts/run_dgrpool_phenotype.py`.
 **Status:** Complete
 **Key result:** 17 of 18 elastic net LOO-CV tests against Unckless et al. 2015 metabolic measures show no spectral signal, including glycogen, the strongest published correlate of starvation resistance in their own data (r=0.307). One weak result (protein, low-glucose diet, R²=0.066) is not a mean-collapse artefact, but it is uncorrected for multiple comparisons across 18 tests and should not be read as a finding. Combined with the five phenotype targets from markdown 07, the FTIR signal looks specific to this lab's own starvation assay rather than to metabolic status in general.
 
