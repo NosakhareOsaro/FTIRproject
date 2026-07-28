@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/macbookpro2020/Documents/Dessertation/**)",
+      "Bash(Rscript *)",
+      "Bash(.venv/bin/python *)",
+      "Bash(brew install *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(/usr/bin/python3 *)",
+      "Bash(git commit *)",
+      "Bash(echo \"launched PID $!\")",
+      "Bash(git remote *)",
+      "Bash(cd *)",
+      "Bash(disown)",
+      "Bash(awk '/^### /{name=$0} /predictions collapse toward the training mean/{print name\" -> COLLAPSED: \"$0}' /private/tmp/claude-501/-Users-macbookpro2020-Documents-Dessertation-FTIRproject/ab6bcaf6-edef-48c5-902e-15a56ea21ba3/scratchpad/unckless_runs.log)",
+      "Bash(awk '/^### /{name=$0} /predictions collapse toward the training mean/{print name\" -> COLLAPSED: \"$0}' /private/tmp/claude-501/-Users-macbookpro2020-Documents-Dessertation-FTIRproject/ab6bcaf6-edef-48c5-902e-15a56ea21ba3/scratchpad/unckless_diet_runs.log)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(git push *)",
+      "WebSearch",
+      "Bash(pandoc \"Results_Section_with_Figures.docx\" -o results_section_extracted.md --wrap=none)",
+      "Bash(jobs -l)",
+      "Bash(echo \"started RF with PID $!\")",
+      "Bash(.venv/bin/pip install *)"
+    ]
+  }
+}
