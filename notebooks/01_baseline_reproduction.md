@@ -107,12 +107,12 @@ As part of this step, all six spectral data files were verified against the pre-
 
 | File             | Spectra | Pre-print figure              | Match |
 | ---------------- | ------- | ----------------------------- | ----- |
-| DGRPFTIR.dat     | 1,772   | ~1,700 individual fly spectra |       |
-| SexGenoFTIR.dat  | 1,684   | Fig 1A: 944F + 740M           |       |
-| Diet2FTIR.dat    | 1,187   | Fig S5C: 358 + 358 + 471      |       |
-| AgeFTIR.dat      | 2,046   | Fig S5F: 637 + 726 + 683      |       |
-| Diet-AgeFTIR.dat | 1,870   | Fig S5I design                |       |
-| Diet1FTIR.dat    | 177     | Fig S5L: 88 + 89              |       |
+| DGRPFTIR.dat     | 1,772   | ~1,700 individual fly spectra | Yes   |
+| SexGenoFTIR.dat  | 1,684   | Fig 1A: 944F + 740M           | Yes   |
+| Diet2FTIR.dat    | 1,187   | Fig S5C: 358 + 358 + 471      | Yes   |
+| AgeFTIR.dat      | 2,046   | Fig S5F: 637 + 726 + 683      | Yes   |
+| Diet-AgeFTIR.dat | 1,870   | Fig S5I design                | Yes   |
+| Diet1FTIR.dat    | 177     | Fig S5L: 88 + 89              | Yes   |
 
 All six files match. The re-upload from Rita is confirmed genuine.
 
