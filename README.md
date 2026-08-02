@@ -1,12 +1,29 @@
 # FTIR project
 
-This project involves analysing Fourier Transform Infrared (FTIR) Spectroscopy data from Drosophila melanogaster to predict variation in genotype, physiology, and stress response
+MSc dissertation. Can FTIR spectra of *Drosophila melanogaster* (the DGRP
+panel) predict continuous phenotype, not just classify it (classification
+is what the lab pre-print this builds on did: Ibrahim et al., bioRxiv 2026,
+doi:10.64898/2026.03.22.713522).
 
-# phenotype-data/
+Short version of where this stands: FTIR predicts starvation resistance
+well in our own data (elastic net, LOO-CV R²=0.673). It does not predict
+much else. Same phenotype measured by a different lab, no. Lifespan,
+fecundity, chill coma recovery, cuticle hydrocarbons, six Unckless
+metabolic measures across three diet conditions, no. Roughly thirty
+phenotype/diet/temperature tests run in total: two show real signal (both
+starvation resistance), two are weak uncorrected candidates, the rest are
+nulls. As a final, unrelated check, lipidomics does predict BMI in the
+EATRIS-Plus human cohort (R²=0.28). Modest for that field, but real, and
+the first positive result in the whole project that isn't starvation
+resistance.
 
-External DGRP phenotype data downloaded from DGRPool (dgrpool.epfl.ch).
-Used as regression targets for the FTIR → phenotype prediction pipeline.
+Where to look for more:
 
-| File                               | Study                           | Phenotype                    | Source                          | Downloaded |
-| ---------------------------------- | ------------------------------- | ---------------------------- | ------------------------------- | ---------- |
-| S24_StarvationRes_summary_mean.tsv | Morgante et al. 2015 (Study 24) | Starvation resistance (mean) | dgrpool.epfl.ch/phenotypes/2798 | 2026-06-16 |
+- `PROJECT_NOTES.md`. The working log. Design decisions and every result,
+  in the order things actually happened.
+- `REPRODUCE.md`. Every command to reproduce this from a fresh clone,
+  raw-data sources included.
+- `phenotype-data/README.md`. Every phenotype file used as a target, where
+  it came from, what it showed.
+- `notebooks/`. Write-ups of the bigger side quests (Unckless, the
+  Durham/Huang lifespan and fecundity work, EATRIS-Plus lipidomics).

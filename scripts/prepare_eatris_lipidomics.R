@@ -2,7 +2,9 @@
 ####
 #### Extracts three lipidomics feature matrices - positive mode, negative
 #### mode, and a combined positive+negative matrix - plus the BMI phenotype
-#### vector, from the EATRIS-Plus MultiAssayExperiment (Zenodo DOI
+#### vector and a small Sex/Age/BMI covariates file (used only for the
+#### demographic-confound check, not for the regression pipeline itself),
+#### from the EATRIS-Plus MultiAssayExperiment (Zenodo DOI
 #### 10.5281/zenodo.17514796, 125 healthy human adults). Writes plain TSV
 #### files so the Python pipeline can read them with no R/Bioconductor
 #### dependency downstream.
@@ -95,6 +97,19 @@ bmi_df <- data.frame(
 bmi_df <- bmi_df[bmi_df$sample_id %in% shared_samples, ]
 bmi_df <- bmi_df[match(shared_samples, bmi_df$sample_id), ]
 
+# ---- Sex/Age covariates, for the demographic-confound check only ----------
+# Not used by the regression pipeline - written so the check in notebook 10
+# (does the lipidomics signal just recover Sex/Age?) has a reproducible
+# source file instead of a one-off interactive extraction.
+cov_df <- data.frame(
+  sample_id = rownames(cd),
+  Sex = cd$Sex,
+  Age = as.numeric(cd$Age),
+  BMI = as.numeric(cd$BMI)
+)
+cov_df <- cov_df[cov_df$sample_id %in% shared_samples, ]
+cov_df <- cov_df[match(shared_samples, cov_df$sample_id), ]
+
 # ---- Write outputs ----------------------------------------------------------
 write_matrix_tsv <- function(mat, path) {
   out <- data.frame(sample_id = rownames(mat), mat, check.names = FALSE)
@@ -105,6 +120,8 @@ write_matrix_tsv(pos_mat, file.path(OUT_DIR, "EATRIS_Lipidomics_positive.tsv"))
 write_matrix_tsv(neg_mat, file.path(OUT_DIR, "EATRIS_Lipidomics_negative.tsv"))
 write_matrix_tsv(combined_mat, file.path(OUT_DIR, "EATRIS_Lipidomics_combined.tsv"))
 write.table(bmi_df, file.path(OUT_DIR, "EATRIS_BMI.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(cov_df, file.path(OUT_DIR, "EATRIS_covariates.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 
 # ---- Summary ----------------------------------------------------------------
@@ -121,7 +138,10 @@ summarise_one("EATRIS_Lipidomics_combined.tsv", combined_mat)
 cat(sprintf("%-32s %4d samples,   BMI non-missing: %d, range %g - %g\n",
             "EATRIS_BMI.tsv", nrow(bmi_df), sum(!is.na(bmi_df$BMI)),
             min(bmi_df$BMI, na.rm = TRUE), max(bmi_df$BMI, na.rm = TRUE)))
-cat("\nSample ID order identical across all four files:",
+cat(sprintf("%-32s %4d samples,   Sex/Age/BMI, for the confound check only\n",
+            "EATRIS_covariates.tsv", nrow(cov_df)))
+cat("\nSample ID order identical across all five files:",
     identical(rownames(pos_mat), rownames(neg_mat)) &&
       identical(rownames(pos_mat), rownames(combined_mat)) &&
-      identical(rownames(pos_mat), bmi_df$sample_id), "\n")
+      identical(rownames(pos_mat), bmi_df$sample_id) &&
+      identical(rownames(pos_mat), cov_df$sample_id), "\n")

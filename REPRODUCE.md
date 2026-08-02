@@ -211,6 +211,42 @@ hyperparameters, expect several minutes.
 
 ## 5. Fecundity cross-phenotype (dedicated script)
 
+### 5.1 Obtain the raw DGRPool phenotype files
+
+This section and Section 6 both use phenotype files downloaded by hand
+from DGRPool (dgrpool.epfl.ch) - these are browser downloads from the
+site's phenotype browser, not a single scriptable URL the way the
+Unckless/EATRIS sources are, so there's no `curl` command to give here.
+Place the files at:
+
+```
+phenotype-data/S18_LifeFecundity_mean.tsv      (Study 18: dgrpool.epfl.ch/studies/18)
+phenotype-data/S24_StarvationRes_summary_mean.tsv  (Study 24, Morgante et al. 2015: dgrpool.epfl.ch/phenotypes/2798)
+phenotype-data/S_Lifespan_mean.tsv             (Ivanov et al. 2015; study number wasn't noted at download time)
+phenotype-data/S24_ChillComaRec_mean.tsv       (Study 24, Morgante et al. 2015)
+phenotype-data/S_CuticHC_nC25_mean.tsv         (Dembeck et al. 2015; study number wasn't noted at download time)
+```
+
+The exact phenotype-browser URL wasn't recorded for the last three at the
+time they were downloaded (2026-07-03) - only the study/paper. If these
+ever need re-downloading, `phenotype-data/README.md`'s per-file notes are
+the fullest record of what's in each: line counts, sex composition, and
+which of our 108 FTIR lines are present.
+
+`phenotype-data/S00_EMMeans_starvation.tsv` is different from the other
+four: it isn't a DGRPool download at all, it's our own `Emmeans.csv`
+(Section 2.1) reformatted into the same DGRP/sex/value shape. Regenerate
+it with:
+
+```bash
+.venv/bin/python scripts/prepare_smoke_test_phenotype.py
+```
+
+**Output:** `phenotype-data/S00_EMMeans_starvation.tsv` (108 rows).
+**Time:** instant, it's a column rename and a hardcoded `sex="F"`.
+
+### 5.2 Run the fecundity analysis
+
 ```bash
 .venv/bin/python scripts/run_fecundity_enet.py
 ```
@@ -253,6 +289,9 @@ environment. All are the same computation (elastic net LOO-CV with a
 nested alpha/l1-ratio search over 1,723 wavenumbers), so runtime mostly
 tracks the number of overlapping lines and system load rather than the
 phenotype itself.
+
+Sections 6.1-6.5 all need the phenotype files obtained/generated in
+Section 5.1 above.
 
 ### 6.1 Smoke test (internal EMMeans, validates the script is correct)
 
@@ -589,9 +628,10 @@ md5 mae_mae.rds mae_experiments.h5
 # mae_experiments.h5: 9938d9731fe58ca67326109a58a47a82
 ```
 
-`mae_experiments.h5` (104MB) is gitignored — over GitHub's 100MB file-size
-limit — so it must be downloaded separately even after cloning this repo.
-`mae_mae.rds` (4.3MB) is small enough to be tracked normally.
+`mae_experiments.h5` (104MB) is gitignored, since it's over GitHub's
+100MB file-size limit, so it has to be downloaded separately even after
+cloning this repo. `mae_mae.rds` (4.3MB) is small enough to be tracked
+normally.
 
 ### 9.3 Inspect the structure (no files written)
 
@@ -611,20 +651,29 @@ Rscript scripts/prepare_eatris_lipidomics.R
 ```
 
 Extracts positive-mode (196 features), negative-mode (164 features), and a
-combined (360 features, `pos_`/`neg_` prefixed) lipidomics matrix, plus the
-BMI phenotype vector, all matched to the same 125 samples. Resolves the
-HDF5-backed assay data via an absolute path computed with `here()` rather
-than a working-directory-dependent `setwd()`, so it can be run from
-anywhere inside the repo. Writes:
+combined (360 features, `pos_`/`neg_` prefixed) lipidomics matrix, the BMI
+phenotype vector, and a small Sex/Age/BMI covariates file, all matched to
+the same 125 samples. Resolves the HDF5-backed assay data via an absolute
+path computed with `here()` rather than a working-directory-dependent
+`setwd()`, so it can be run from anywhere inside the repo. Writes:
 
 ```
 phenotype-data/EATRIS_Lipidomics_positive.tsv
 phenotype-data/EATRIS_Lipidomics_negative.tsv
 phenotype-data/EATRIS_Lipidomics_combined.tsv
 phenotype-data/EATRIS_BMI.tsv
+phenotype-data/EATRIS_covariates.tsv
 ```
 
-Prints a summary (dimensions, sample counts, NA counts) for all four
+`EATRIS_covariates.tsv` (Sex, Age, BMI) isn't used by the regression
+pipeline itself - it only feeds the demographic-confound check in
+`notebooks/10_eatris_lipidomics_bmi.md` (is the lipidomics signal just
+recovering Sex or Age?). It was originally pulled out with a quick
+interactive `Rscript -e` one-liner and only folded into this script
+afterward, once it was clear the confound check was worth keeping around
+rather than a throwaway sanity check.
+
+Prints a summary (dimensions, sample counts, NA counts) for all five
 outputs. **Time:** a few seconds.
 
 ### 9.5 Run the method comparison on all three conditions
@@ -643,8 +692,8 @@ outputs. **Time:** a few seconds.
 Each runs PLS, Ridge, LASSO, and elastic net with LOO-CV over all 125
 samples, and appends 4 rows to
 `results/EATRIS/lipidomics_bmi_summary.csv`. **Time (observed on this
-machine):** all three conditions complete in well under a minute combined
-— far faster than the DGRP FTIR runs, since these matrices have 164-360
+machine):** all three conditions complete in well under a minute combined,
+far faster than the DGRP FTIR runs, since these matrices have 164-360
 features versus FTIR's 1,723 wavenumbers.
 
 Full results, the per-fold discipline verification, the Sex/Age confound

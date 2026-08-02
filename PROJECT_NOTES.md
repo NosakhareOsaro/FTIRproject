@@ -30,8 +30,10 @@ methods (PLS-DA, elastic net, LASSO) serve as baselines within the broader
 comparison: the frequentist angle is not abandoned, just embedded in a wider
 sweep. Common evaluation yardstick: held-out prediction performance (R² for
 continuous targets, accuracy for discrete). A set of external clinical cohorts
-(NoMIC, EATRIS-Plus, ROP, IBD, IMPACC, CMAISE) are referenced as motivation
-only, not worked through, unless time allows after the FTIR work.
+(NoMIC, ROP, IBD, IMPACC, CMAISE) are referenced as motivation only, not
+worked through, unless time allows after the FTIR work. EATRIS-Plus turned
+out to be the exception: there was time, and it got a full pipeline of its
+own once the DGRP cross-phenotype work wound down (see §7f).
 
 ---
 
@@ -181,7 +183,7 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    (mated, three temperatures) tested at Adam's request (§7e): 5 of 6 null;
    lifespan shows no signal regardless of mating status, with one weak
    unconfirmed candidate at 25°C, the standard DGRP rearing temperature.
-   Third and final task from the same email — EATRIS-Plus human lipidomics
+   Third and final task from the same email, EATRIS-Plus human lipidomics
    vs. BMI, a different species and pipeline entirely (§7f): a real,
    non-collapsed positive signal (elastic net R²=0.283), the first outside
    the DGRP starvation-resistance work in this project, though modest
@@ -439,7 +441,7 @@ low-glucose diet).
 
 Follow-up request from Adam (email, 2026-08-01): §7c's Ivanov lifespan null
 used unmated/virgin females, leaving open whether mating status explains the
-absence of signal. Adam sent two further sources: Durham, Magwire, Stone &
+absence of signal. Further sources were considered, such as: Durham, Magwire, Stone &
 Leips (2014, DGRPool study 12), mated female lifespan and age-specific
 fecundity at week 1 and week 7; and Huang et al. (2020, DGRPool study 40),
 mated female lifespan at 18°C, 25°C, and 28°C.
@@ -456,21 +458,21 @@ not raw egg counts, so small negative LS means are possible. All six run
 through `run_dgrpool_phenotype.py` with default `--sex F`/`--spectral-sex
 F` (same-sex comparison; no cross-sex flag needed here, unlike §7d).
 
-| Phenotype | Study | n lines | CV R² | Spearman ρ | Result |
-|---|---|---|---|---|---|
-| Lifespan (mated) | Durham 2014 | 96 | −0.085 | −0.970 (artefact) | Collapsed null |
-| Fecundity Week 1 | Durham 2014 | 96 | −0.058 | −0.686 (artefact) | Collapsed null |
-| Fecundity Week 7 | Durham 2014 | 76 | −0.006 | +0.219 | Null, not collapsed |
-| Lifespan 18°C (mated) | Huang 2020 | 99 | −0.023 | −0.999 (artefact) | Collapsed null |
-| **Lifespan 25°C (mated)** | **Huang 2020** | **102** | **+0.056** | **+0.263** | Not collapsed (SD ratio 0.294), weak candidate |
-| Lifespan 28°C (mated) | Huang 2020 | 99 | −0.034 | −1.000 (artefact) | Collapsed null |
+| Phenotype                 | Study          | n lines | CV R²      | Spearman ρ        | Result                                         |
+| ------------------------- | -------------- | ------- | ---------- | ----------------- | ---------------------------------------------- |
+| Lifespan (mated)          | Durham 2014    | 96      | −0.085     | −0.970 (artefact) | Collapsed null                                 |
+| Fecundity Week 1          | Durham 2014    | 96      | −0.058     | −0.686 (artefact) | Collapsed null                                 |
+| Fecundity Week 7          | Durham 2014    | 76      | −0.006     | +0.219            | Null, not collapsed                            |
+| Lifespan 18°C (mated)     | Huang 2020     | 99      | −0.023     | −0.999 (artefact) | Collapsed null                                 |
+| **Lifespan 25°C (mated)** | **Huang 2020** | **102** | **+0.056** | **+0.263**        | Not collapsed (SD ratio 0.294), weak candidate |
+| Lifespan 28°C (mated)     | Huang 2020     | 99      | −0.034     | −1.000 (artefact) | Collapsed null                                 |
 
 **Interpretation.** Including the earlier Ivanov 2015 result (virgin
 females, R²=−0.052, §7c), five independent lifespan tests have now been
 run: 1 virgin cohort and 4 mated cohorts (Durham, plus Huang at three
 temperatures). Four of the five collapse with no usable signal.
-**Lifespan shows no reliable FTIR signal regardless of mating status** —
-the mated-vs-virgin distinction motivating this extension does not explain
+**Lifespan shows no reliable FTIR signal regardless of mating status.** The
+mated-vs-virgin distinction motivating this extension does not explain
 the earlier null. The one exception, Huang 25°C (R²=+0.056), is not a
 mean-collapse artefact (SD ratio 0.294, well above the 0.2 threshold), but
 it is weak in absolute terms and uncorrected for multiple comparisons
@@ -499,10 +501,9 @@ separately rather than folded into this count.
 
 ---
 
-## 7f. EATRIS-Plus lipidomics-to-BMI (human cohort — different species, different pipeline)
+## 7f. EATRIS-Plus lipidomics-to-BMI (human cohort, different species and pipeline)
 
-Third and final task from the same email that produced §7e: whether
-lipidome features predict BMI quantitatively. Adam pointed to the
+Third and final task: whether lipidome features predict BMI quantitatively. Adam pointed to the
 EATRIS-Plus multi-omics dataset (Zenodo DOI 10.5281/zenodo.17514796, 125
 healthy human adults) as "a very promising dataset" for asking this
 directly in humans, rather than by analogy from the DGRP fly panel. This
@@ -530,11 +531,11 @@ location inside the repo).
 hyperparameter-selection discipline as the DGRP regularised-regression
 scripts:
 
-| Condition | Best method | n | p | CV R² | Spearman ρ |
-|---|---|---|---|---|---|
-| Positive mode | Elastic net | 125 | 196 | **+0.283** | +0.545 |
-| Negative mode | Elastic net | 125 | 164 | +0.219 | +0.526 |
-| Combined | Elastic net | 125 | 360 | +0.271 | +0.546 |
+| Condition     | Best method | n   | p   | CV R²      | Spearman ρ |
+| ------------- | ----------- | --- | --- | ---------- | ---------- |
+| Positive mode | Elastic net | 125 | 196 | **+0.283** | +0.545     |
+| Negative mode | Elastic net | 125 | 164 | +0.219     | +0.526     |
+| Combined      | Elastic net | 125 | 360 | +0.271     | +0.546     |
 
 None of these collapse (unlike almost everything in §7a-§7e): all three
 conditions, across all four methods tested (PLS, Ridge, LASSO, elastic
@@ -549,18 +550,18 @@ for the DGRP scripts, with one inherited (not new) caveat: PLS's optimal
 scores across the sweep, a practice carried over from `run_pls_analysis.py`
 that does not affect the elastic net result. (2) Sex/Age confound check:
 Sex-BMI r=+0.291 (modest), Age-BMI r=-0.011 (negligible); a trivial
-Sex+Age-only baseline achieves R²=+0.039 — the lipidomics models beat this
+Sex+Age-only baseline achieves R²=+0.039. The lipidomics models beat this
 5-7x, ruling out a demographic-proxy explanation. (3) Literature context:
 a large, externally-validated lipidomics-BMI study (FINRISK/MDC-CC,
 n=1,061+250, PLOS Biology 2019) reports BMI R²=0.47 with a far more
 favourable feature-to-sample ratio after LASSO selection than used here;
 this exact cohort's own companion paper (bioRxiv 2024.11.07.622407) found
 lipidomics alone to be a weaker single-omics BMI predictor than
-metabolites, with multi-omics integration beating any single layer —
-directly consistent with the modest, non-dominant signal found here.
+metabolites, with multi-omics integration beating any single layer.
+Directly consistent with the modest, non-dominant signal found here.
 
 **Verdict.** A real, non-collapsed signal clearly distinguishable from a
-trivial demographic baseline — categorically different from every DGRP
+trivial demographic baseline. Categorically different from every DGRP
 result in §7b-§7e, none of which produced anything like this. But it is
 modest relative to the well-powered external literature ceiling, obtained
 without external validation in a small-sample, high-dimensional (p>n)
@@ -575,7 +576,11 @@ work in this entire project. Full writeup: `notebooks/10_eatris_lipidomics_bmi.m
 
 Python: pandas, numpy, scikit-learn, xgboost, seaborn, matplotlib.
 (PLSRegression and PLS-DA are in scikit-learn: sklearn.cross_decomposition.)
-R 4.4.2: rms, survival, emmeans, MASS, car, Rtsne, ggplot2.
+R 4.5.1: rms, survival, emmeans, MASS, car, Rtsne, ggplot2, here. Plus,
+since §7f, the Bioconductor side needed to read the EATRIS-Plus
+MultiAssayExperiment: MultiAssayExperiment, HDF5Array, rhdf5,
+SummarizedExperiment (installed via BiocManager, not CRAN; see
+REPRODUCE.md §9.1 for the exact install command).
 
 ---
 
