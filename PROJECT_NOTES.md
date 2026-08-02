@@ -181,6 +181,11 @@ Steps 1–4 complete. Steps 5–6 are the active frontier.
    (mated, three temperatures) tested at Adam's request (§7e): 5 of 6 null;
    lifespan shows no signal regardless of mating status, with one weak
    unconfirmed candidate at 25°C, the standard DGRP rearing temperature.
+   Third and final task from the same email — EATRIS-Plus human lipidomics
+   vs. BMI, a different species and pipeline entirely (§7f): a real,
+   non-collapsed positive signal (elastic net R²=0.283), the first outside
+   the DGRP starvation-resistance work in this project, though modest
+   relative to the published lipidomics-BMI literature ceiling.
 
 ---
 
@@ -487,7 +492,82 @@ R²=0.041, weak positive, consistent with cross-lab measurement noise), 26
 other independent phenotype/diet/temperature tests showing no signal
 (fecundity ×3, lifespan ×4, chill coma, cuticle HC, and 17 of 18 Unckless
 measures/diets), and 2 weak, unconfirmed candidates (Unckless protein
-low-glucose diet; Huang lifespan at 25°C).
+low-glucose diet; Huang lifespan at 25°C). This tally (30 tests: 2 signal,
+26 null, 2 candidate) is specific to the DGRP FTIR cross-phenotype
+pipeline; see §7f for a categorically different result that is tracked
+separately rather than folded into this count.
+
+---
+
+## 7f. EATRIS-Plus lipidomics-to-BMI (human cohort — different species, different pipeline)
+
+Third and final task from the same email that produced §7e: whether
+lipidome features predict BMI quantitatively. Adam pointed to the
+EATRIS-Plus multi-omics dataset (Zenodo DOI 10.5281/zenodo.17514796, 125
+healthy human adults) as "a very promising dataset" for asking this
+directly in humans, rather than by analogy from the DGRP fly panel. This
+is **not a DGRP FTIR test**: different species, different profiling
+technology (LC-MS lipidomics, not FTIR), different pipeline
+(`scripts/run_eatris_lipidomics_bmi.py`, standalone, not
+`run_dgrpool_phenotype.py`). It is reported here for narrative continuity
+with the rest of Adam's three-task request, not as an addition to the
+30-test DGRP tally above.
+
+**Data.** The Zenodo object is an R `MultiAssayExperiment`: 15 experiments
+across six omics platforms, 125 samples, BMI complete (125/125, range
+21-37). `scripts/explore_eatris_mae.R` established this structure
+(inspection only). Two lipidomics assays were extracted via
+`scripts/prepare_eatris_lipidomics.R`: positive mode (196 features) and
+negative mode (164 features), both with full 125/125 sample overlap, plus
+a combined 360-feature matrix. Assay data is HDF5-backed with a
+working-directory-dependent path baked into the `.rds` object; the
+extraction script fixes this by resolving the raw-data directory via
+`here()` and overwriting the HDF5 seed's path directly, rather than
+relying on a fragile `setwd()` (verified robust to invocation from any
+location inside the repo).
+
+**Results.** Elastic net LOO-CV, same per-fold `StandardScaler` and
+hyperparameter-selection discipline as the DGRP regularised-regression
+scripts:
+
+| Condition | Best method | n | p | CV R² | Spearman ρ |
+|---|---|---|---|---|---|
+| Positive mode | Elastic net | 125 | 196 | **+0.283** | +0.545 |
+| Negative mode | Elastic net | 125 | 164 | +0.219 | +0.526 |
+| Combined | Elastic net | 125 | 360 | +0.271 | +0.546 |
+
+None of these collapse (unlike almost everything in §7a-§7e): all three
+conditions, across all four methods tested (PLS, Ridge, LASSO, elastic
+net), produce real, non-degenerate CV R² in the 0.10-0.28 range. Positive
+mode alone edges out the combined matrix; both clearly beat negative mode
+alone.
+
+**Verification before accepting this as real.** (1) Per-fold fitting
+discipline confirmed directly from the code, matching the standard used
+for the DGRP scripts, with one inherited (not new) caveat: PLS's optimal
+`n_components` is chosen post-hoc by comparing already-computed LOO-CV
+scores across the sweep, a practice carried over from `run_pls_analysis.py`
+that does not affect the elastic net result. (2) Sex/Age confound check:
+Sex-BMI r=+0.291 (modest), Age-BMI r=-0.011 (negligible); a trivial
+Sex+Age-only baseline achieves R²=+0.039 — the lipidomics models beat this
+5-7x, ruling out a demographic-proxy explanation. (3) Literature context:
+a large, externally-validated lipidomics-BMI study (FINRISK/MDC-CC,
+n=1,061+250, PLOS Biology 2019) reports BMI R²=0.47 with a far more
+favourable feature-to-sample ratio after LASSO selection than used here;
+this exact cohort's own companion paper (bioRxiv 2024.11.07.622407) found
+lipidomics alone to be a weaker single-omics BMI predictor than
+metabolites, with multi-omics integration beating any single layer —
+directly consistent with the modest, non-dominant signal found here.
+
+**Verdict.** A real, non-collapsed signal clearly distinguishable from a
+trivial demographic baseline — categorically different from every DGRP
+result in §7b-§7e, none of which produced anything like this. But it is
+modest relative to the well-powered external literature ceiling, obtained
+without external validation in a small-sample, high-dimensional (p>n)
+regime, and consistent with (not better than) what this cohort's own
+authors found for single-omics BMI prediction. The first genuinely
+positive, thoroughly-vetted result outside the DGRP starvation-resistance
+work in this entire project. Full writeup: `notebooks/10_eatris_lipidomics_bmi.md`.
 
 ---
 
