@@ -97,7 +97,7 @@ The FTIR signal is primarily driven by the C-H stretching region (~2,900-3,000 c
 
 Lifetime fecundity depends on different biochemistry. Reproductive investment in Drosophila involves resource allocation to ovary development, vitellogenin production, and egg maturation, processes driven by protein synthesis and carbohydrate metabolism more than by bulk lipid content. The FTIR measurement at the cuticle surface does not directly reflect the biochemical variation underlying fecundity.
 
-This result is consistent with Adam's observation after seeing the starvation results: the FTIR prediction approach may be most useful for traits where lipid metabolism is involved. The fecundity null result supports this hypothesis and narrows the scope of what the chemotype actually measures.
+This result is consistent with the idea that emerged after seeing the starvation results: the FTIR prediction approach may be most useful for traits where lipid metabolism is involved. The fecundity null result supports this hypothesis and narrows the scope of what the chemotype actually measures.
 
 **This is a meaningful negative result, not a failure.** A method that predicts everything would be uninformative about biology. The specificity of the FTIR signal to starvation-relevant lipid variation, and its absence for fecundity, is itself a finding about the biochemical content of the measurement.
 

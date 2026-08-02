@@ -103,7 +103,7 @@ The loading vector is smooth and interpretable: it does not look like random noi
 
 **Biological interpretation:** Lines with higher starvation resistance appear to have greater lipid content in their cuticular chemical fingerprint, as measured by FTIR. This makes strong biological sense. Fat reserves (primarily stored as triacylglycerols) are the primary energy source during starvation in Drosophila. Lines that can store more lipid are better buffered against starvation. The FTIR measurement at the cuticle surface picks up this variation in lipid content and uses it to predict how long flies will survive without food.
 
-This connects directly to Adam's comment after seeing the results: the FTIR prediction method may be most useful for traits where lipid metabolism is involved, an observation directly supported by the loading vector showing the lipid band as the dominant spectral feature.
+This connects directly to the idea that the FTIR prediction method may be most useful for traits where lipid metabolism is involved, an idea directly supported by the loading vector showing the lipid band as the dominant spectral feature.
 
 ---
 
