@@ -10,3 +10,9 @@ results/DGRP/*.zip
 PROJECT_NOTES.md
 METHOD_SKETCH.md
 REPRODUCE.md
+
+# EATRIS-Plus MultiAssayExperiment assay data (Zenodo DOI 10.5281/zenodo.17514796):
+# 112MB, over GitHub's 100MB hard file-size limit. Download separately per
+# REPRODUCE.md; mae_mae.rds (4.3MB, the MAE scaffolding/colData) is small
+# enough to commit and is tracked normally.
+phenotype-data/raw/mae_experiments.h5

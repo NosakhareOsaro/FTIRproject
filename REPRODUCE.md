@@ -550,11 +550,116 @@ system sleep from pausing the computation mid-run.
 
 ---
 
+## 9. EATRIS-Plus lipidomics-to-BMI (human cohort, R + Python)
+
+Third task from Adam's most recent email: whether lipidome features predict
+BMI quantitatively, this time in the EATRIS-Plus human clinical cohort
+(125 healthy adults) rather than the DGRP fly panel.
+
+### 9.1 R packages
+
+```bash
+Rscript -e 'install.packages("BiocManager", repos="https://cloud.r-project.org")
+BiocManager::install(c("MultiAssayExperiment","HDF5Array","rhdf5","SummarizedExperiment"), update=FALSE, ask=FALSE)'
+```
+
+`here` is also required (already installed for Section 2.1's survival analysis).
+
+### 9.2 Obtain the raw MultiAssayExperiment object
+
+This project does not download these files automatically. Obtain both files
+from Zenodo (DOI 10.5281/zenodo.17514796) and place them at:
+
+```
+phenotype-data/raw/mae_mae.rds
+phenotype-data/raw/mae_experiments.h5
+```
+
+```bash
+cd phenotype-data/raw
+curl -sL -o mae_mae.rds "https://zenodo.org/records/17514796/files/mae_mae.rds?download=1"
+curl -sL -o mae_experiments.h5 "https://zenodo.org/records/17514796/files/mae_experiments.h5?download=1"
+```
+
+Verify checksums:
+
+```bash
+md5 mae_mae.rds mae_experiments.h5
+# mae_mae.rds:        329e82b9341071e2a91c20e537903505
+# mae_experiments.h5: 9938d9731fe58ca67326109a58a47a82
+```
+
+`mae_experiments.h5` (104MB) is gitignored — over GitHub's 100MB file-size
+limit — so it must be downloaded separately even after cloning this repo.
+`mae_mae.rds` (4.3MB) is small enough to be tracked normally.
+
+### 9.3 Inspect the structure (no files written)
+
+```bash
+Rscript scripts/explore_eatris_mae.R
+```
+
+Reports all 15 experiments and dimensions, the full `colData` column list
+and BMI completeness, and sample ID overlap between the lipidomics assays
+and the phenotype table. See `notebooks/10_eatris_lipidomics_bmi.md` for
+the full findings.
+
+### 9.4 Extract the lipidomics matrices and BMI phenotype
+
+```bash
+Rscript scripts/prepare_eatris_lipidomics.R
+```
+
+Extracts positive-mode (196 features), negative-mode (164 features), and a
+combined (360 features, `pos_`/`neg_` prefixed) lipidomics matrix, plus the
+BMI phenotype vector, all matched to the same 125 samples. Resolves the
+HDF5-backed assay data via an absolute path computed with `here()` rather
+than a working-directory-dependent `setwd()`, so it can be run from
+anywhere inside the repo. Writes:
+
+```
+phenotype-data/EATRIS_Lipidomics_positive.tsv
+phenotype-data/EATRIS_Lipidomics_negative.tsv
+phenotype-data/EATRIS_Lipidomics_combined.tsv
+phenotype-data/EATRIS_BMI.tsv
+```
+
+Prints a summary (dimensions, sample counts, NA counts) for all four
+outputs. **Time:** a few seconds.
+
+### 9.5 Run the method comparison on all three conditions
+
+```bash
+.venv/bin/python scripts/run_eatris_lipidomics_bmi.py \
+  phenotype-data/EATRIS_Lipidomics_positive.tsv --condition "Positive mode"
+
+.venv/bin/python scripts/run_eatris_lipidomics_bmi.py \
+  phenotype-data/EATRIS_Lipidomics_negative.tsv --condition "Negative mode"
+
+.venv/bin/python scripts/run_eatris_lipidomics_bmi.py \
+  phenotype-data/EATRIS_Lipidomics_combined.tsv --condition "Combined"
+```
+
+Each runs PLS, Ridge, LASSO, and elastic net with LOO-CV over all 125
+samples, and appends 4 rows to
+`results/EATRIS/lipidomics_bmi_summary.csv`. **Time (observed on this
+machine):** all three conditions complete in well under a minute combined
+— far faster than the DGRP FTIR runs, since these matrices have 164-360
+features versus FTIR's 1,723 wavenumbers.
+
+Full results, the per-fold discipline verification, the Sex/Age confound
+check, and literature context are in
+`notebooks/10_eatris_lipidomics_bmi.md`.
+
+---
+
 ## Where results accumulate
 
 - `results/DGRP/dgrpool_phenotype_summary.csv`: one row per run through
   Section 6's general-purpose runner (Sections 6, 7, and 8).
 - `results/DGRP/perfly_metrics.csv`: per-fly pipeline metrics (Section 4.1).
+- `results/EATRIS/lipidomics_bmi_summary.csv`: one row per method per
+  condition run through Section 9's runner.
 - All plots land in `results/DGRP/`.
 - `Emmeans.csv` and the sensitive/resistant CSVs land in the repo root
   (Section 2.1).
