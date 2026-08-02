@@ -159,7 +159,9 @@ Phenotype data:
 
 ## 7. Work order
 
-Steps 1–4 complete. Steps 5–6 are the active frontier.
+Steps 1–5 complete. Step 5 is where the project spent most of its time,
+extending well past the original three phenotypes into the sub-sections
+below (§7a–§7f).
 
 1. **[DONE] Reproduce Rita's classification baseline** on `DGRPFTIR.dat`.
    Recovered ~88.5% resistant / ~83.9% sensitive SVM reclassification
@@ -476,7 +478,8 @@ mated-vs-virgin distinction motivating this extension does not explain
 the earlier null. The one exception, Huang 25°C (R²=+0.056), is not a
 mean-collapse artefact (SD ratio 0.294, well above the 0.2 threshold), but
 it is weak in absolute terms and uncorrected for multiple comparisons
-across the roughly three dozen phenotype tests run in this project so far.
+across the 30 phenotype tests run in this project so far (exact count
+below).
 Framing it around mating status would be a weaker claim than the data
 support, since three of the four mated cohorts are also null; the more
 defensible observation is that 25°C is the standard DGRP rearing
@@ -576,9 +579,13 @@ work in this entire project. Full writeup: `notebooks/10_eatris_lipidomics_bmi.m
 
 Python: pandas, numpy, scikit-learn, xgboost, seaborn, matplotlib.
 (PLSRegression and PLS-DA are in scikit-learn: sklearn.cross_decomposition.)
-R 4.5.1: rms, survival, emmeans, MASS, car, Rtsne, ggplot2, here. Plus,
-since §7f, the Bioconductor side needed to read the EATRIS-Plus
-MultiAssayExperiment: MultiAssayExperiment, HDF5Array, rhdf5,
+R 4.5.1: survival, coxme, car, dplyr, emmeans, ggplot2, effectsize,
+ggh4x, knitr, ciTools, here, survminer, rms, see. (Rtsne is only used in
+Rita's original, unmodified `DGRP_survival_analysis.R`, not the portable
+copy this project actually runs, and MASS isn't used anywhere. This list
+was out of date; REPRODUCE.md §1 has the version actually installed and
+run.) Plus, since §7f, the Bioconductor side needed to read the
+EATRIS-Plus MultiAssayExperiment: MultiAssayExperiment, HDF5Array, rhdf5,
 SummarizedExperiment (installed via BiocManager, not CRAN; see
 REPRODUCE.md §9.1 for the exact install command).
 
