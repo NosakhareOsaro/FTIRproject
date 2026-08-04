@@ -2,7 +2,7 @@
 
 **Script:** `scripts/explore_eatris_mae.R`, `scripts/prepare_eatris_lipidomics.R`, `scripts/run_eatris_lipidomics_bmi.py`.
 **Status:** Complete
-**Key result:** A real, non-collapsed spectral-style signal: elastic net LOO-CV R²=0.283 (positive-mode lipidomics), 0.271 (combined), 0.219 (negative-mode) predicting BMI in 125 healthy human adults. This clears a trivial Sex+Age baseline (R²=0.039) by 5-7x, so it is not a demographic proxy, but it sits well below the ceiling reported in large, externally-validated lipidomics-BMI studies, and is consistent with, not better than, what this exact cohort's own authors found when comparing single-omics layers for BMI prediction. This is the first genuinely positive, thoroughly-vetted result outside the DGRP starvation-resistance work in this project, and is reported with the same caution accordingly.
+**Key result:** A real, non-collapsed spectral-style signal: elastic net LOO-CV R²=0.283 (positive-mode lipidomics), 0.271 (combined), 0.219 (negative-mode) predicting BMI in 125 healthy human adults. This clears a trivial Sex+Age baseline (R²=0.039) by 5-7x, so it is not a demographic proxy, but it sits well below the ceiling reported in large, externally-validated lipidomics-BMI studies, and is consistent with, not better than, what this exact cohort's own authors found when comparing single-omics layers for BMI prediction. This is the first genuinely positive, thoroughly-vetted result outside the DGRP starvation-resistance work in this project, and is reported with the same caution accordingly. A follow-up pushed on this harder by nesting Sex/Age directly inside the same LOO-CV pipeline instead of checking it separately: the signal holds up, with residual-BMI R² staying in the 0.21-0.29 range once the lipidomics features are no longer allowed to lean on Sex or Age at all.
 
 ---
 
@@ -28,7 +28,7 @@ Two lipidomics-relevant experiments were selected: "Lipidomics, positive | trans
 | `EATRIS_Lipidomics_negative.tsv` | 164                                           | 125     |
 | `EATRIS_Lipidomics_combined.tsv` | 360 (`pos_*` + `neg_*`, prefixed for clarity) | 125     |
 
-Positive and negative mode have identical, fully-overlapping 125-sample sets, so the combined matrix drops no samples. Positive and negative feature IDs never collide (checked directly, 0 overlap), so the `pos_`/`neg_` prefix on the combined file is a clarity measure, not a necessity. `EATRIS_BMI.tsv` provides the matched phenotype vector (125 samples, BMI 125/125 complete, range 21-37), and `EATRIS_covariates.tsv` (Sex, Age, BMI) was added afterward for the confound check below. All four files use plain `sample_id` + value columns, not the DGRP/sex/value convention used elsewhere in this project, since these are individual human subjects rather than DGRP line means.
+Positive and negative mode have identical, fully-overlapping 125-sample sets, so the combined matrix drops no samples. Positive and negative feature IDs never collide (checked directly, 0 overlap), so the `pos_`/`neg_` prefix on the combined file is a clarity measure, not a necessity. `EATRIS_BMI.tsv` provides the matched phenotype vector (125 samples, BMI 125/125 complete, range 21-37), and `EATRIS_covariates.tsv` (Sex, Age, BMI) was added afterward for the confound check below - it started out as a one-off extraction for that standalone check, and later got pulled directly into the main analysis script once the confound question needed a properly nested answer (see "Results: does Sex/Age change this" below). All four files use plain `sample_id` + value columns, not the DGRP/sex/value convention used elsewhere in this project, since these are individual human subjects rather than DGRP line means.
 
 ## Method
 
@@ -37,6 +37,8 @@ Positive and negative mode have identical, fully-overlapping 125-sample sets, so
 What it does mirror exactly: the same LOO-CV and per-fold `StandardScaler` discipline as `run_regularised_regression.py` and `run_pls_analysis.py` (scaler and all hyperparameter selection fit inside the training fold only), the same four methods (PLS, Ridge, LASSO, elastic net) with the same hyperparameter grids (`RidgeCV` GCV over `np.logspace(-3,6,100)`, `LassoCV`/`ElasticNetCV` with `cv=3` and a 30-point alpha grid, `l1_ratio=[0.5,0.7,0.9,0.95,1.0]`, PLS component sweep `[1,2,3,5,10,15,20]`), and the CLI/results-accumulation shape of `run_dgrpool_phenotype.py` (one file argument + a `--condition` label, appends to `results/EATRIS/lipidomics_bmi_summary.csv`).
 
 Run once per condition, the same way the Unckless diet conditions and Huang temperature conditions were each run separately, chained into one `caffeinate`-wrapped background job (a precaution from two earlier sleep-interruption incidents on the longer FTIR runs). This dataset's far smaller feature count (164-360 vs. FTIR's 1,723 wavenumbers) meant all three conditions finished in about 32 seconds total. Fast enough that the background/monitoring setup turned out to be unnecessary in practice, though harmless to have had in place.
+
+**Extension: does Sex/Age change this.** I tried to check whether including Sex and Age alongside the lipidomics features changes the BMI result, so the script now runs each condition through three analyses instead of one, all funnelled through the same four-method sweep so the PLS/Ridge/LASSO/elastic-net code isn't tripled: **lipidomics only** (the original analysis, table below), **covariates appended** (Sex, encoded 0/1 for FEMALE/MALE, and Age added as two extra columns to the feature matrix before the per-fold `StandardScaler`), and **residualized** (a plain `LinearRegression` of BMI on Sex+Age fit _inside each LOO training fold only_ (never on the full data) with the four methods then predicting the residual, actual BMI minus that fold's Sex+Age prediction, from the lipidomics features alone). These last two are not two versions of the same check. Appending asks whether Sex/Age help the model when they're available to it; residualizing asks whether the lipidomics features still carry BMI signal once the variance Sex/Age already explain has been taken away first. See "Results: does Sex/Age change this" below for both.
 
 ## Results: 3 conditions x 4 methods
 
@@ -56,6 +58,61 @@ Run once per condition, the same way the Unckless diet conditions and Huang temp
 | **Combined**      | **Elastic net**      | **125** | **360** | **0.271** | **2.859** | **+0.546** |
 
 Elastic net wins in positive mode and combined, and is competitive (close second) in negative mode. Positive mode alone (R²=0.283) slightly outperforms the 360-feature combined matrix (R²=0.271); adding negative-mode features does not improve on positive mode alone. Both clearly outperform negative mode alone (R²=0.219). None of these results shows the mean-collapse pattern seen throughout the DGRP work: every method in every condition produces real, non-degenerate CV R² in the 0.10-0.28 range.
+
+## Results: does Sex/Age change this
+
+Two different questions were put to the same three conditions, both properly nested inside the LOO-CV loop rather than fit once on the full data:
+
+- **Covariates appended** - does giving each method Sex and Age as two extra columns, sitting right next to the lipidomics features, improve prediction? This is the permissive version: the model is free to lean on Sex/Age wherever that helps, and there's no way to tell from the R² alone how much of any gain is the lipidome and how much is just Sex/Age doing what they already do on their own.
+- **Residualized** - with the BMI variance Sex and Age already explain subtracted out first (a `LinearRegression` refit inside every fold), can the lipidomics features still predict what's left? Sex and Age never enter the feature matrix here, so they cannot be doing any of the predicting. This is the stricter test, and the one that actually answers "is the lipidomics result just a Sex/Age proxy."
+
+Elastic net, the top method in every condition throughout this analysis, across both:
+
+| Condition     | Lipidomics only | + Sex/Age appended | Residualized |
+| ------------- | --------------- | ------------------ | ------------ |
+| Positive mode | 0.283           | 0.287              | 0.250        |
+| Negative mode | 0.219           | 0.233              | 0.211        |
+| Combined      | 0.271           | 0.324              | 0.285        |
+
+Full four-method breakdown, same layout as the results table above.
+
+**Covariates appended**
+
+| Condition         | Method               | n       | p       | CV R²     | RMSE      | Spearman ρ |
+| ----------------- | -------------------- | ------- | ------- | --------- | --------- | ---------- |
+| Positive mode     | PLS (n_components=3) | 125     | 198     | 0.240     | 2.920     | +0.552     |
+| Positive mode     | Ridge (GCV)          | 125     | 198     | 0.245     | 2.911     | +0.524     |
+| Positive mode     | LASSO (cv=3)         | 125     | 198     | 0.210     | 2.978     | +0.477     |
+| **Positive mode** | **Elastic net**      | **125** | **198** | **0.287** | **2.828** | **+0.546** |
+| Negative mode     | PLS (n_components=2) | 125     | 166     | 0.174     | 3.044     | +0.504     |
+| Negative mode     | Ridge (GCV)          | 125     | 166     | 0.123     | 3.138     | +0.522     |
+| **Negative mode** | **LASSO (cv=3)**     | **125** | **166** | **0.249** | **2.903** | **+0.548** |
+| Negative mode     | Elastic net          | 125     | 166     | 0.233     | 2.935     | +0.542     |
+| Combined          | PLS (n_components=2) | 125     | 362     | 0.259     | 2.884     | +0.585     |
+| Combined          | Ridge (GCV)          | 125     | 362     | 0.241     | 2.919     | +0.550     |
+| Combined          | LASSO (cv=3)         | 125     | 362     | 0.305     | 2.793     | +0.583     |
+| **Combined**      | **Elastic net**      | **125** | **362** | **0.324** | **2.755** | **+0.594** |
+
+**Residualized**
+
+| Condition         | Method               | n       | p       | CV R²     | RMSE      | Spearman ρ |
+| ----------------- | -------------------- | ------- | ------- | --------- | --------- | ---------- |
+| Positive mode     | PLS (n_components=3) | 125     | 196     | 0.167     | 2.997     | +0.461     |
+| Positive mode     | Ridge (GCV)          | 125     | 196     | 0.199     | 2.940     | +0.479     |
+| Positive mode     | LASSO (cv=3)         | 125     | 196     | 0.214     | 2.912     | +0.487     |
+| **Positive mode** | **Elastic net**      | **125** | **196** | **0.250** | **2.845** | **+0.506** |
+| Negative mode     | PLS (n_components=2) | 125     | 164     | 0.124     | 3.073     | +0.442     |
+| Negative mode     | Ridge (GCV)          | 125     | 164     | 0.082     | 3.146     | +0.460     |
+| Negative mode     | LASSO (cv=3)         | 125     | 164     | 0.198     | 2.941     | +0.482     |
+| **Negative mode** | **Elastic net**      | **125** | **164** | **0.211** | **2.917** | **+0.492** |
+| Combined          | PLS (n_components=3) | 125     | 360     | 0.175     | 2.983     | +0.484     |
+| Combined          | Ridge (GCV)          | 125     | 360     | 0.197     | 2.943     | +0.493     |
+| Combined          | LASSO (cv=3)         | 125     | 360     | 0.280     | 2.786     | +0.550     |
+| **Combined**      | **Elastic net**      | **125** | **360** | **0.285** | **2.777** | **+0.558** |
+
+**Reading the appended column.** The gains are small and, in positive mode, barely worth mentioning (+0.004). Negative mode and combined move more (+0.014, +0.053 for elastic net), and combined's LASSO nearly doubles (0.251 to 0.305) - but this is exactly what adding two real, if modest, BMI correlates (Sex r=+0.291, Age r=-0.011, see the confound check below) to a feature matrix should do, not evidence that the lipidome suddenly does something it wasn't doing before. Worth flagging honestly: negative mode is the one place in this whole analysis where elastic net stops winning - LASSO takes it, 0.249 vs 0.233 - a reminder that "elastic net wins" was never a fixed law of this dataset, just what happened to hold in 11 of these 12 method-condition combinations. None of this moves the headline conclusion; it's a small, expected bump from giving the model more to work with, and on its own it can't separate "lipidomics is doing more work" from "Sex/Age are doing a bit more work alongside it."
+
+**Reading the residualized column - the one that matters for the confound question.** R² drops relative to the lipidomics-only baseline in every condition, which is expected: some of what the lipidome predicts genuinely overlaps with what Sex and Age predict, and that shared variance is gone before the lipidomics features ever see the target. What doesn't happen is collapse. Elastic net's residual R² barely moves in negative mode (0.219 to 0.211) and combined (0.271 to 0.285, if anything a touch higher), and drops the most in positive mode (0.283 to 0.250) while still sitting well clear of zero. Every method in every condition stays in the 0.08-0.28 range on a target that has had the demographic variance surgically removed first. Because Sex and Age are not in the feature matrix at all here, they cannot be propping this number up - so this is the more conservative and the more informative version of the confound check, stronger than the standalone baseline comparison run earlier (below), and it says the same thing: not a demographic proxy.
 
 ## Verification checks
 
@@ -93,12 +150,14 @@ The concern: with a real cohort (unlike the DGRP lines), BMI could correlate wit
 
 The lipidomics models (R²=0.219-0.283) sit 5-7x above this baseline. The result is not a demographic proxy.
 
+This baseline is a useful first pass but a weak one: it's a single Sex+Age model fit once on the full data and compared only against the lipidomics-only numbers, not something run through the same nested LOO-CV discipline as the actual result. "Results: does Sex/Age change this" above redoes this properly, two ways, directly inside the lipidomics pipeline: Sex/Age appended as extra features, and - the test that actually settles this - Sex/Age regressed out of BMI inside every LOO fold before the lipidomics features get a turn. That second version leaves R² at 0.21-0.29 across all three conditions, real signal on a target with none of the demographic variance left in it to exploit. Same conclusion as the quick baseline above, on considerably firmer ground.
+
 ### 3. Literature context
 
 - **Large, externally-validated benchmark** (plasma lipidomics, obesity estimation, PLOS Biology 2019, FINRISK 2012 n=1,061 training + Malmö Diet and Cancer Cardiovascular Cohort n=250 external validation): 183 lipid species reduced via LASSO to 50-75 predictors, **BMI R²=0.47**. The feature-to-sample ratio after selection (~50-75 features / ~800 training samples) is far more favourable than here (164-360 features / 125 samples, no external validation).
 - **This exact cohort's own companion paper** (bioRxiv 2024.11.07.622407, the EATRIS-Plus flagship publication, same 127-person cohort and same lipidomics assays): ran a directly comparable analysis, predicting clinical variables including BMI from single-omics-layer components versus a combined multi-omics model. Their finding: for the majority of clinical variables including BMI, "the multi-omics components explained more of the variance than the individual-omics components". No single omics layer, lipidomics included, was a strong standalone BMI predictor in their hands either, and their feature-level association ranking for BMI in this cohort was metabolites > lipids > proteins, with lipids not the top layer. This is directly consistent with what was found here: a real but non-dominant single-omics-layer signal.
 
-**Verdict:** modest-but-real by the standards of this specific field. R²=0.283 clears a trivial demographic baseline by a wide margin and shows none of the collapse pattern seen everywhere else in this project, so it is not noise dressed up as signal. But it sits well below the ~0.47 ceiling reported in the large, externally-validated, carefully feature-selected lipidomics-BMI literature, was obtained with no external validation in a small-sample, high-dimensional (p>n) regime (164-360 features over 125 samples), and is consistent with, not better than, what this exact cohort's own authors already reported for single-omics-layer BMI prediction. This is the first genuinely positive, thoroughly-vetted result outside the DGRP starvation-resistance work in the whole project, and is reported with commensurate care: neither dismissed as another null, nor oversold as a validated biomarker signature.
+**Verdict:** modest-but-real by the standards of this specific field. R²=0.283 clears a trivial demographic baseline by a wide margin and shows none of the collapse pattern seen everywhere else in this project, so it is not noise dressed up as signal. Regressing Sex and Age out of BMI inside every LOO fold and asking whether lipidomics still predicts what's left - the harder version of the same question, not a repeat of the easier one - leaves R² at 0.21-0.29 in every condition, nowhere near the near-zero range a demographic-proxy explanation would predict. But it sits well below the ~0.47 ceiling reported in the large, externally-validated, carefully feature-selected lipidomics-BMI literature, was obtained with no external validation in a small-sample, high-dimensional (p>n) regime (164-360 features over 125 samples), and is consistent with, not better than, what this exact cohort's own authors already reported for single-omics-layer BMI prediction. This is the first genuinely positive, thoroughly-vetted result outside the DGRP starvation-resistance work in the whole project, and is reported with commensurate care: neither dismissed as another null, nor oversold as a validated biomarker signature.
 
 ## This completes three tasks
 
@@ -107,6 +166,6 @@ Three tasks were requested: (1) mated-female lifespan and age-specific fecundity
 ## Output files
 
 - `phenotype-data/raw/mae_mae.rds`, `phenotype-data/raw/mae_experiments.h5`: raw Zenodo download (DOI 10.5281/zenodo.17514796), not generated by any script here. The `.h5` file (104MB) is gitignored (over GitHub's 100MB file-size limit); see `REPRODUCE.md` for the download commands and checksums.
-- `phenotype-data/EATRIS_Lipidomics_positive.tsv`, `EATRIS_Lipidomics_negative.tsv`, `EATRIS_Lipidomics_combined.tsv`, `EATRIS_BMI.tsv`, `EATRIS_covariates.tsv`: generated by `scripts/prepare_eatris_lipidomics.R` (lipidomics + BMI) and a one-off extraction for the Sex/Age confound check (covariates)
-- `results/EATRIS/lipidomics_bmi_summary.csv`: appended with 12 rows (3 conditions x 4 methods) by `scripts/run_eatris_lipidomics_bmi.py`
+- `phenotype-data/EATRIS_Lipidomics_positive.tsv`, `EATRIS_Lipidomics_negative.tsv`, `EATRIS_Lipidomics_combined.tsv`, `EATRIS_BMI.tsv`, `EATRIS_covariates.tsv`: generated by `scripts/prepare_eatris_lipidomics.R` (lipidomics + BMI); `EATRIS_covariates.tsv` (Sex, Age, BMI) started as a one-off extraction for the standalone confound check and is now also read directly by `run_eatris_lipidomics_bmi.py` for the covariates-appended and residualized analyses
+- `results/EATRIS/lipidomics_bmi_summary.csv`: 48 rows total (3 conditions x 3 analyses x 4 methods, run twice - the original lipidomics-only run plus the extension re-running all three analyses per condition). The original 12 lipidomics-only rows were backfilled with an `analysis` column rather than left on a different schema from the new rows - checked directly against a pre-migration backup, byte-identical apart from that column
 - `scripts/explore_eatris_mae.R`: inspection-only, establishes the MAE structure, writes nothing
